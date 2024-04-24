@@ -1,0 +1,13 @@
+{
+  "name": "source-learn",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "install": "node cli/install.js",
+    "re-install": "node cli/re-install.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
