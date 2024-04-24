@@ -1,0 +1,9 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "target": "es5",
+        "noUnusedLocals": false,
+        "lib": ["dom"]
+    },
+    "include": ["src"]
+}

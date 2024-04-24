@@ -1,0 +1,8 @@
+Fastify command line interface available commands are:
+
+  * start                 start a server
+  * generate              init a project
+  * version               the current hoth-cli version
+  * help                  help about commands
+
+Launch 'hoth help [command]' to learn more about each command.

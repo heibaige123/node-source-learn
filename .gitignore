@@ -1,0 +1,10 @@
+**/.DS_Store
+**/coverage
+**/node_modules
+**/*.tgz
+**/.cache
+**/.temp
+**/package-lock.json
+**/pnpm-lock.yaml
+**/yarn.lock
+**/*.zip
