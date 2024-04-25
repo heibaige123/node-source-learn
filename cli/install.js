@@ -1,9 +1,11 @@
 const { exec } = require('child_process');
-const { getDir } = require('./utils');
+const { getSecondDir } = require('./utils');
 
-getDir().then((dirs) => {
+getSecondDir().then((dirs) => {
     dirs.forEach((dir) => {
         exec(`cd ${dir} && pnpm i && cd ..`, (err) => {
+            console.log(`${dir} 安装依赖成功`);
+
             if (err) {
                 console.error('安装失败：', dir, err);
             }

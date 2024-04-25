@@ -153,7 +153,6 @@
     }
   ],
   "devDependencies": {
-    "@fastify/pre-commit": "^2.0.2",
     "@sinclair/typebox": "^0.31.17",
     "@sinonjs/fake-timers": "^11.1.0",
     "@types/node": "^20.8.4",
