@@ -21,8 +21,7 @@ export default function (app: string) {
                     for (const key of Object.keys(obj)) {
                         if (['req', 'res', 'err', 'app'].includes(key)) {
                             resOb[key] = obj[key];
-                        }
-                        else {
+                        } else {
                             extraInfo[key] = obj[key];
                         }
                     }

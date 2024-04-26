@@ -9,7 +9,6 @@ import mockConsole from 'jest-mock-console';
 import {symbols} from 'pino';
 
 describe('@hoth/logger logger', function () {
-
     process.env.HOTH_IDC = 'all';
     process.env.HOTH_CLUSTER = 'test';
 
@@ -23,12 +22,12 @@ describe('@hoth/logger logger', function () {
         rootPath,
         apps: [
             {
-                name: 'aa'
+                name: 'aa',
             },
             {
-                name: 'bb'
-            }
-        ]
+                name: 'bb',
+            },
+        ],
     });
 
     const stream = logger[symbols.streamSym as any];
@@ -41,9 +40,15 @@ describe('@hoth/logger logger', function () {
 
     it('file created', function () {
         setTimeout(() => {
-            expect(existsSync(join(rootPath, 'log/hoth/hoth.log.2021020100'))).toBe(true);
-            expect(existsSync(join(rootPath, 'log/aa/aa.log.2021020100'))).toBe(true);
-            expect(existsSync(join(rootPath, 'log/bb/bb.log.2021020100'))).toBe(true);
+            expect(
+                existsSync(join(rootPath, 'log/hoth/hoth.log.2021020100')),
+            ).toBe(true);
+            expect(existsSync(join(rootPath, 'log/aa/aa.log.2021020100'))).toBe(
+                true,
+            );
+            expect(existsSync(join(rootPath, 'log/bb/bb.log.2021020100'))).toBe(
+                true,
+            );
 
             expect(console.log).toBeCalled();
         }, 100);
@@ -52,7 +57,10 @@ describe('@hoth/logger logger', function () {
     it('normal log', function (done) {
         logger.info('test');
         setTimeout(() => {
-            const log = readFileSync(join(rootPath, 'log/hoth/hoth.log.ti.2021020100'), 'utf8');
+            const log = readFileSync(
+                join(rootPath, 'log/hoth/hoth.log.ti.2021020100'),
+                'utf8',
+            );
             expect(log).toContain('test');
             expect(log).toContain('INFO: 2021-02-01 00:00:00');
             expect(log).toContain('idc[all]');
@@ -71,14 +79,17 @@ describe('@hoth/logger logger', function () {
             req: {
                 url: '/foo/cc',
                 headers: {
-                    'user-agent': 'mock'
+                    'user-agent': 'mock',
                 },
                 method: 'post',
-                product: 'product_aa'
+                product: 'product_aa',
             },
         });
         setTimeout(() => {
-            const log = readFileSync(join(rootPath, 'log/aa/aa.log.2021020100'), 'utf8');
+            const log = readFileSync(
+                join(rootPath, 'log/aa/aa.log.2021020100'),
+                'utf8',
+            );
             expect(log).toContain('NOTICE: 2021-02-01 00:00:00');
             expect(log).toContain('idc[all]');
             expect(log).toContain('cluster[test]');
@@ -98,7 +109,10 @@ describe('@hoth/logger logger', function () {
             responseTime: 20,
         });
         setTimeout(() => {
-            const log = readFileSync(join(rootPath, 'log/bb/bb.log.2021020100'), 'utf8');
+            const log = readFileSync(
+                join(rootPath, 'log/bb/bb.log.2021020100'),
+                'utf8',
+            );
             expect(log).toContain('NOTICE: 2021-02-01 00:00:00');
             expect(log).toContain('idc[all]');
             expect(log).toContain('cluster[test]');
@@ -119,16 +133,22 @@ describe('@hoth/logger logger', function () {
             req: {
                 url: '/foo/cc',
                 headers: {
-                    'user-agent': 'mock'
+                    'user-agent': 'mock',
                 },
-                method: 'post'
+                method: 'post',
             },
         });
-        logger.error({
-            app: 'bb'
-        }, 'a msg err');
+        logger.error(
+            {
+                app: 'bb',
+            },
+            'a msg err',
+        );
         setTimeout(() => {
-            const log = readFileSync(join(rootPath, 'log/bb/bb.log.wf.2021020100'), 'utf8');
+            const log = readFileSync(
+                join(rootPath, 'log/bb/bb.log.wf.2021020100'),
+                'utf8',
+            );
             expect(log).toContain('FATAL: 2021-02-01 00:00:00');
             expect(log).toContain('idc[all]');
             expect(log).toContain('cluster[test]');
@@ -153,17 +173,19 @@ describe('@hoth/logger logger', function () {
 
     it('compile format', () => {
         const fun1 = compile(':response-time[aa]');
-        expect(fun1.toString()).toContain('tokens[\"response-time\"](o, \"aa\") || \"-\")');
+        expect(fun1.toString()).toContain(
+            'tokens["response-time"](o, "aa") || "-")',
+        );
 
         const fun2 = compile(':foo[aa]');
         expect(fun2.toString()).toContain(':foo(aa)');
 
         const fun3 = compile(':ua');
-        expect(fun3.toString()).toContain('tokens[\"ua\"]');
+        expect(fun3.toString()).toContain('tokens["ua"]');
         expect(fun3.toString()).toContain('-');
 
         const fun4 = compile('+:fields');
-        expect(fun4.toString()).toContain('tokens[\"fields\"]');
+        expect(fun4.toString()).toContain('tokens["fields"]');
         expect(fun4.toString()).not.toContain('-');
     });
 

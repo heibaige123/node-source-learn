@@ -1,8 +1,8 @@
 {
-  "exclude": [
-    "lib/configValidator.js",
-    "lib/error-serializer.js",
-    "build/build-error-serializer.js",
-    "test/*"
-  ]
+    "exclude": [
+        "lib/configValidator.js",
+        "lib/error-serializer.js",
+        "build/build-error-serializer.js",
+        "test/*"
+    ]
 }

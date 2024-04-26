@@ -11,7 +11,7 @@ let appConfig = {
     dir: '',
     prefix: '',
     name: '',
-    rootPath: ''
+    rootPath: '',
 };
 
 describe('loadMoleculeApp test', () => {
@@ -22,7 +22,7 @@ describe('loadMoleculeApp test', () => {
             dir: `${__dirname}/moleucleMock/`,
             prefix: '',
             name: 'myapp',
-            rootPath: ''
+            rootPath: '',
         };
         // @ts-ignore
         process.env.DATA_MOCK = '';
@@ -35,25 +35,27 @@ describe('loadMoleculeApp test', () => {
         await loadMoleculeApp(appConfig, fInstance);
         let response = await fInstance.inject({
             method: 'GET',
-            path: '/index'
+            path: '/index',
         });
         expect(response.statusCode).toBe(200);
-        expect(response.body).toBe(JSON.stringify({
-            statusCode: 200,
-            data: 'mock ok'
-        }));
+        expect(response.body).toBe(
+            JSON.stringify({
+                statusCode: 200,
+                data: 'mock ok',
+            }),
+        );
 
         // test post
         let response2 = await fInstance.inject({
             method: 'POST',
-            path: '/route2'
+            path: '/route2',
         });
         expect(response2.body).toBe('mock ok');
 
         // test patch
         let response3 = await fInstance.inject({
             method: 'patch',
-            path: '/route3'
+            path: '/route3',
         });
         expect(response3.statusCode).toBe(200);
     });
@@ -66,12 +68,14 @@ describe('loadMoleculeApp test', () => {
         await loadMoleculeApp(appConfig, fInstance);
         let response = await fInstance.inject({
             method: 'GET',
-            path: '/index'
+            path: '/index',
         });
-        expect(response.body).toBe(JSON.stringify({
-            statusCode: 500,
-            message: 'render error'
-        }));
+        expect(response.body).toBe(
+            JSON.stringify({
+                statusCode: 500,
+                message: 'render error',
+            }),
+        );
     });
 
     it('data should mock', async () => {
@@ -84,11 +88,10 @@ describe('loadMoleculeApp test', () => {
         await loadMoleculeApp(appConfig, fInstance);
         let response = await fInstance.inject({
             method: 'GET',
-            path: '/index'
+            path: '/index',
         });
 
         expect(response.statusCode).toBe(200);
         expect(moleculeMock.mock.calls[0][1]).toEqual({title: 'myapp'});
     });
-
 });

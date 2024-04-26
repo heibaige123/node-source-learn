@@ -1,6 +1,4 @@
-import {
-    threadPlugin
-} from '../src/main/index';
+import {threadPlugin} from '../src/main/index';
 import path from 'path';
 import fastify, {FastifyInstance} from 'fastify';
 
@@ -13,7 +11,7 @@ describe('hoth init thread', () => {
 
     beforeEach(() => {
         app = fastify({
-            logger: false
+            logger: false,
         });
     });
     it('should error', async () => {
@@ -23,13 +21,12 @@ describe('hoth init thread', () => {
                 threadsNumber: 1,
                 filename: path.resolve(__dirname, './sample/worker.js'),
                 logConfig: {
-                    appName: 'meixg'
+                    appName: 'meixg',
                 },
                 // @ts-ignore
-                env: 123
+                env: 123,
             });
-        }
-        catch (e) {
+        } catch (e) {
             fn((e as Error).message);
         }
         expect(fn).toHaveBeenCalledWith('options.env should be an object.');
@@ -41,12 +38,11 @@ describe('hoth init thread', () => {
                 threadsNumber: 1,
                 filename: path.resolve(__dirname, './sample/worker.js'),
                 logConfig: {
-                    appName: 'meixg'
+                    appName: 'meixg',
                 },
-                env: process.env
+                env: process.env,
             });
-        }
-        catch (e) {
+        } catch (e) {
             fn((e as Error).message);
         }
         expect(fn).not.toHaveBeenCalled();
@@ -56,15 +52,14 @@ describe('hoth init thread', () => {
             threadsNumber: 1,
             filename: path.resolve(__dirname, './sample/worker.js'),
             logConfig: {
-                appName: 'meixg'
+                appName: 'meixg',
             },
             warmupConfig: {
                 maxConcurrent: 5,
                 warmupData: ['a.json'],
-                basePath: path.resolve(__dirname, './warmupData')
+                basePath: path.resolve(__dirname, './warmupData'),
             },
-            env: {
-            }
+            env: {},
         });
 
         // @ts-ignore

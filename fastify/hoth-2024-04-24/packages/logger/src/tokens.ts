@@ -17,7 +17,14 @@ export default {
         return o.req?.logid || uuid();
     },
     module(o) {
-        return o.req?.module || o.req?.url.split('?')[0].split('/').filter(a => a && a !== o.app).join('_');
+        return (
+            o.req?.module ||
+            o.req?.url
+                .split('?')[0]
+                .split('/')
+                .filter((a) => a && a !== o.app)
+                .join('_')
+        );
     },
     product(o) {
         return o.req?.product || o.app;
@@ -78,37 +85,54 @@ export default {
         if (isEmpty(o.extraInfo)) {
             return '';
         }
-        return ' ' + Object.keys(o.extraInfo).map(key => {
-            const notice = o.extraInfo[key];
-            return `${key}[${notice}]`;
-        }).join(' ');
+        return (
+            ' ' +
+            Object.keys(o.extraInfo)
+                .map((key) => {
+                    const notice = o.extraInfo[key];
+                    return `${key}[${notice}]`;
+                })
+                .join(' ')
+        );
     },
     fields(o) {
         if (isEmpty(o.req?.fields)) {
             return '';
         }
-        return ' ' + Object.keys(o.req.fields).map(key => {
-            const fields = o.req.fields[key];
-            return `${key}[${fields}]`;
-        }).join(' ');
+        return (
+            ' ' +
+            Object.keys(o.req.fields)
+                .map((key) => {
+                    const fields = o.req.fields[key];
+                    return `${key}[${fields}]`;
+                })
+                .join(' ')
+        );
     },
     notices(o) {
         if (isEmpty(o.req?.notices)) {
             return '';
         }
-        return ' ' + Object.keys(o.req.notices).map(key => {
-            const notice = o.req.notices[key];
-            return `${key}[${notice}]`;
-        }).join(' ');
+        return (
+            ' ' +
+            Object.keys(o.req.notices)
+                .map((key) => {
+                    const notice = o.req.notices[key];
+                    return `${key}[${notice}]`;
+                })
+                .join(' ')
+        );
     },
     performance(o) {
         if (isEmpty(o.req?.performance)) {
             return '';
         }
-        const perfStr = Object.keys(o.req.performance).map(key => {
-            const pref = o.req.performance[key];
-            return `${key}:${pref[0]}:${pref[1].toFixed(1)}`;
-        }).join(' ');
+        const perfStr = Object.keys(o.req.performance)
+            .map((key) => {
+                const pref = o.req.performance[key];
+                return `${key}:${pref[0]}:${pref[1].toFixed(1)}`;
+            })
+            .join(' ');
         return perfStr;
     },
     // req(o, field) {

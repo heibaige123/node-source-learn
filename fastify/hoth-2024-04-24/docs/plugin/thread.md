@@ -17,10 +17,10 @@ import {FastifyInstance} from 'fastify';
 export default async function main(fastify: FastifyInstance, config) {
     const pool = await initThread({
         logConfig: {
-            appName: config.name
+            appName: config.name,
         },
         threadsNumber: 10,
-        filename: path.resolve(__dirname, 'worker.js')
+        filename: path.resolve(__dirname, 'worker.js'),
     });
 
     // 自己处理 pool 的使用方式
@@ -33,7 +33,12 @@ export default async function main(fastify: FastifyInstance, config) {
 ## 在 controller 中使用
 
 ```ts
-import {Controller, GET, Inject, getFastifyInstanceByAppName} from '@hoth/decorators';
+import {
+    Controller,
+    GET,
+    Inject,
+    getFastifyInstanceByAppName,
+} from '@hoth/decorators';
 import {FastifyReply, FastifyRequest} from 'fastify';
 
 @Controller('/index')
@@ -77,7 +82,7 @@ const conf = {
     warmupConfig: {
         warmupData: [''],
         basePath: path.resolve(__dirname, '../worker/warmupData'),
-        maxConcurrent: 10
-    }
+        maxConcurrent: 10,
+    },
 } as HothThreadConf;
 ```

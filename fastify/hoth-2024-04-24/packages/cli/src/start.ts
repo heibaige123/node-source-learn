@@ -45,8 +45,7 @@ function initFinalLogger(logger: pino.Logger) {
         return function (err: any, evt?: any) {
             if (err) {
                 logger.fatal({err}, evt);
-            }
-            else {
+            } else {
                 logger.info(`${evt} caught`);
             }
             process.exit(err ? 1 : 0);
@@ -58,8 +57,7 @@ function initFinalLogger(logger: pino.Logger) {
     return pino.final(logger, (err, finalLogger, evt) => {
         if (err) {
             finalLogger.fatal({err}, evt);
-        }
-        else {
+        } else {
             finalLogger.info(`${evt} caught`);
         }
         process.exit(err ? 1 : 0);
@@ -75,7 +73,11 @@ function getOuterIP() {
         }
         for (let i = 0, len = iface.length; i < len; i++) {
             let alias = iface[i];
-            if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+            if (
+                alias.family === 'IPv4' &&
+                alias.address !== '127.0.0.1' &&
+                !alias.internal
+            ) {
                 return alias.address;
             }
         }
@@ -84,7 +86,6 @@ function getOuterIP() {
 }
 
 async function runFastify(opts: Args) {
-
     loadFastify();
 
     const rootPath = process.env.ROOT_PATH || process.cwd();
@@ -122,7 +123,7 @@ async function runFastify(opts: Args) {
 
     const routes: RouteOptions[] = [];
     fastifyInstance.decorate('$addedRoutes', routes);
-    fastifyInstance.addHook('onRoute', routeOptions => {
+    fastifyInstance.addHook('onRoute', (routeOptions) => {
         routes.push(routeOptions);
     });
 
@@ -131,15 +132,22 @@ async function runFastify(opts: Args) {
     });
 
     if (opts.healthcheckPath) {
-        fastifyInstance.get(opts.healthcheckPath, async function (req: FastifyRequest, reply: FastifyReply) {
-            reply.send('ok');
-        });
+        fastifyInstance.get(
+            opts.healthcheckPath,
+            async function (req: FastifyRequest, reply: FastifyReply) {
+                reply.send('ok');
+            },
+        );
     }
 
     const finalLogger = initFinalLogger(logger);
 
     // delay is the number of milliseconds for the graceful close to finish
-    const closeListeners = closeWithGrace({delay: 500}, async function ({signal, err, manual}) {
+    const closeListeners = closeWithGrace({delay: 500}, async function ({
+        signal,
+        err,
+        manual,
+    }) {
         if (!manual) {
             finalLogger(err!, signal);
         }
@@ -147,7 +155,9 @@ async function runFastify(opts: Args) {
     } as closeWithGrace.CloseWithGraceAsyncCallback);
 
     // eslint-disable-next-line
-    require('make-promises-safe').logError = async function (error: Error | string) {
+    require('make-promises-safe').logError = async function (
+        error: Error | string,
+    ) {
         finalLogger(error instanceof Error ? error : null, error);
         await fastifyInstance.close();
     };
@@ -160,10 +170,9 @@ async function runFastify(opts: Args) {
         try {
             await fastifyInstance.register(entryMod, {
                 apps,
-                rootPath
+                rootPath,
             });
-        }
-        catch (err) {
+        } catch (err) {
             finalLogger(err as any);
         }
     }
@@ -171,8 +180,7 @@ async function runFastify(opts: Args) {
     // warmup
     try {
         await warmup(apps, fastifyInstance);
-    }
-    catch (e) {
+    } catch (e) {
         const errorMessage = (e && (e as any).message) || '';
         logger.fatal(`warmup error: ${errorMessage}`);
         process.exit(-1);
@@ -181,14 +189,11 @@ async function runFastify(opts: Args) {
     let address = '';
     if (opts.address) {
         address = await fastifyInstance.listen(opts.port, opts.address);
-    }
-    else /* istanbul ignore next */ if (opts.socket) {
+    } /* istanbul ignore next */ else if (opts.socket) {
         address = await fastifyInstance.listen(opts.socket);
-    }
-    else /* istanbul ignore next */ if (isDocker()) {
+    } /* istanbul ignore next */ else if (isDocker()) {
         address = await fastifyInstance.listen(opts.port, listenAddressDocker);
-    }
-    else {
+    } else {
         address = await fastifyInstance.listen(opts.port);
     }
 
@@ -207,9 +212,7 @@ async function runFastify(opts: Args) {
     return fastifyInstance;
 }
 
-
 export async function start(args: string[]) {
-
     if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         require('dotenv').config();

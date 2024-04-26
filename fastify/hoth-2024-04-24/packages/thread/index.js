@@ -4,7 +4,6 @@ const {isMainThread} = require('worker_threads');
 
 if (isMainThread) {
     module.exports = require('./dist/main');
-}
-else {
+} else {
     module.exports = require('./dist/worker');
 }

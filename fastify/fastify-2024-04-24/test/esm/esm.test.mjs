@@ -1,13 +1,13 @@
-import t from 'tap'
-import Fastify from '../../fastify.js'
+import t from 'tap';
+import Fastify from '../../fastify.js';
 
-t.test('esm support', async t => {
-  const fastify = Fastify()
+t.test('esm support', async (t) => {
+    const fastify = Fastify();
 
-  fastify.register(import('./plugin.mjs'), { foo: 'bar' })
-  fastify.register(import('./other.mjs'))
+    fastify.register(import('./plugin.mjs'), {foo: 'bar'});
+    fastify.register(import('./other.mjs'));
 
-  await fastify.ready()
+    await fastify.ready();
 
-  t.equal(fastify.foo, 'bar')
-})
+    t.equal(fastify.foo, 'bar');
+});

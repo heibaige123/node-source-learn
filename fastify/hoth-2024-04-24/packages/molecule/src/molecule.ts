@@ -37,7 +37,11 @@ interface MoleculeOption {
 
 let controllerCache: Map<string, ControllerInfo<any>> = new Map();
 
-function getOrSetCache<T>(appName: string, ctrlPath: string, option?: ControllerInfo<T>): ControllerInfo<T> | null {
+function getOrSetCache<T>(
+    appName: string,
+    ctrlPath: string,
+    option?: ControllerInfo<T>,
+): ControllerInfo<T> | null {
     let cacheK = `${appName}_${ctrlPath}`;
 
     if (option) {
@@ -59,7 +63,11 @@ function getOrSetCache<T>(appName: string, ctrlPath: string, option?: Controller
  * @param option MoleculeOption
  * @returns 返回 controller.render 的返回值 或 null
  */
-export async function molecule<T = string>(ctrlPath: string, data: any, option: MoleculeOption) {
+export async function molecule<T = string>(
+    ctrlPath: string,
+    data: any,
+    option: MoleculeOption,
+) {
     let ctrlInfo = getOrSetCache<T>(option.appName, ctrlPath);
     let ctrl: IController<T>;
     let logger = option.logger;
@@ -67,8 +75,7 @@ export async function molecule<T = string>(ctrlPath: string, data: any, option: 
     try {
         if (ctrlInfo) {
             ctrl = ctrlInfo.ctrl;
-        }
-        else {
+        } else {
             const fullCtrlPath = path.join(option.root, ctrlPath);
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             const CtrlClass = require(fullCtrlPath).Controller;
@@ -84,9 +91,10 @@ export async function molecule<T = string>(ctrlPath: string, data: any, option: 
 
         let result = await ctrl.render(data);
         return result;
-    }
-    catch (err) {
-        logger.fatal(`Error when render ${option.appName}/${option.name}: ${(err as any).message}`);
+    } catch (err) {
+        logger.fatal(
+            `Error when render ${option.appName}/${option.name}: ${(err as any).message}`,
+        );
         return null;
     }
 }

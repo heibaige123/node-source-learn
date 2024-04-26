@@ -24,23 +24,23 @@ snippet of code.
 
 ### Contents
 
-- [AWS](#aws)
-- [Google Cloud Functions](#google-cloud-functions)
-- [Google Firebase Functions](#google-firebase-functions)
-- [Google Cloud Run](#google-cloud-run)
-- [Netlify Lambda](#netlify-lambda)
-- [Platformatic Cloud](#platformatic-cloud)
-- [Vercel](#vercel)
+-   [AWS](#aws)
+-   [Google Cloud Functions](#google-cloud-functions)
+-   [Google Firebase Functions](#google-firebase-functions)
+-   [Google Cloud Run](#google-cloud-run)
+-   [Netlify Lambda](#netlify-lambda)
+-   [Platformatic Cloud](#platformatic-cloud)
+-   [Vercel](#vercel)
 
 ## AWS
 
 To integrate with AWS, you have two choices of library:
 
-- Using [@fastify/aws-lambda](https://github.com/fastify/aws-lambda-fastify) 
-  which only adds API Gateway support but has heavy optimizations for fastify.
-- Using [@h4ad/serverless-adapter](https://github.com/H4ad/serverless-adapter) 
-  which is a little slower as it creates an HTTP request for each AWS event but 
-  has support for more AWS services such as: AWS SQS, AWS SNS and others.
+-   Using [@fastify/aws-lambda](https://github.com/fastify/aws-lambda-fastify)
+    which only adds API Gateway support but has heavy optimizations for fastify.
+-   Using [@h4ad/serverless-adapter](https://github.com/H4ad/serverless-adapter)
+    which is a little slower as it creates an HTTP request for each AWS event but
+    has support for more AWS services such as: AWS SQS, AWS SNS and others.
 
 So you can decide which option is best for you, but you can test both libraries.
 
@@ -56,20 +56,20 @@ Amazon API Gateway.
 const fastify = require('fastify');
 
 function init() {
-  const app = fastify();
-  app.get('/', (request, reply) => reply.send({ hello: 'world' }));
-  return app;
+    const app = fastify();
+    app.get('/', (request, reply) => reply.send({hello: 'world'}));
+    return app;
 }
 
 if (require.main === module) {
-  // called directly i.e. "node app"
-  init().listen({ port: 3000 }, (err) => {
-    if (err) console.error(err);
-    console.log('server listening on 3000');
-  });
+    // called directly i.e. "node app"
+    init().listen({port: 3000}, (err) => {
+        if (err) console.error(err);
+        console.log('server listening on 3000');
+    });
 } else {
-  // required as a module => executed on aws lambda
-  module.exports = init;
+    // required as a module => executed on aws lambda
+    module.exports = init;
 }
 ```
 
@@ -77,17 +77,17 @@ When executed in your lambda function we do not need to listen to a specific
 port, so we just export the wrapper function `init` in this case. The
 [`lambda.js`](#lambdajs) file will use this export.
 
-When you execute your Fastify application like always, i.e. `node app.js` *(the
-detection for this could be `require.main === module`)*, you can normally listen
+When you execute your Fastify application like always, i.e. `node app.js` _(the
+detection for this could be `require.main === module`)_, you can normally listen
 to your port, so you can still run your Fastify function locally.
 
 #### lambda.js
 
 ```js
-const awsLambdaFastify = require('@fastify/aws-lambda')
+const awsLambdaFastify = require('@fastify/aws-lambda');
 const init = require('./app');
 
-const proxy = awsLambdaFastify(init())
+const proxy = awsLambdaFastify(init());
 // or
 // const proxy = awsLambdaFastify(init(), { binaryMimeTypes: ['application/octet-stream'] })
 
@@ -118,10 +118,10 @@ found
 
 ### Considerations
 
-- API Gateway does not support streams yet, so you are not able to handle
-  [streams](../Reference/Reply.md#streams).
-- API Gateway has a timeout of 29 seconds, so it is important to provide a reply
-  during this time.
+-   API Gateway does not support streams yet, so you are not able to handle
+    [streams](../Reference/Reply.md#streams).
+-   API Gateway has a timeout of 29 seconds, so it is important to provide a reply
+    during this time.
 
 #### Beyond API Gateway
 
@@ -132,9 +132,10 @@ on Fastify to find out how to integrate.
 ## Google Cloud Functions
 
 ### Creation of Fastify instance
+
 ```js
-const fastify = require("fastify")({
-  logger: true // you can also define the level passing an object configuration to logger: {level: 'debug'}
+const fastify = require('fastify')({
+    logger: true, // you can also define the level passing an object configuration to logger: {level: 'debug'}
 });
 ```
 
@@ -149,48 +150,50 @@ Parser`](../Reference/ContentTypeParser.md) to mitigate this behavior.
 
 ```js
 fastify.addContentTypeParser('application/json', {}, (req, body, done) => {
-  done(null, body.body);
+    done(null, body.body);
 });
 ```
 
 ### Define your endpoint (examples)
 
 A simple `GET` endpoint:
+
 ```js
 fastify.get('/', async (request, reply) => {
-  reply.send({message: 'Hello World!'})
-})
+    reply.send({message: 'Hello World!'});
+});
 ```
 
 Or a more complete `POST` endpoint with schema validation:
+
 ```js
 fastify.route({
-  method: 'POST',
-  url: '/hello',
-  schema: {
-    body: {
-      type: 'object',
-      properties: {
-        name: { type: 'string'}
-      },
-      required: ['name']
+    method: 'POST',
+    url: '/hello',
+    schema: {
+        body: {
+            type: 'object',
+            properties: {
+                name: {type: 'string'},
+            },
+            required: ['name'],
+        },
+        response: {
+            200: {
+                type: 'object',
+                properties: {
+                    message: {type: 'string'},
+                },
+            },
+        },
     },
-    response: {
-      200: {
-        type: 'object',
-        properties: {
-          message: {type: 'string'}
-        }
-      }
+    handler: async (request, reply) => {
+        const {name} = request.body;
+        reply.code(200).send({
+            message: `Hello ${name}!`,
+        });
     },
-  },
-  handler: async (request, reply) => {
-    const { name } = request.body;
-    reply.code(200).send({
-      message: `Hello ${name}!`
-    })
-  }
-})
+});
 ```
 
 ### Implement and export the function
@@ -200,9 +203,9 @@ by emitting `request` event to `fastify.server`:
 
 ```js
 const fastifyFunction = async (request, reply) => {
-  await fastify.ready();
-  fastify.server.emit('request', request, reply)
-}
+    await fastify.ready();
+    fastify.server.emit('request', request, reply);
+};
 
 exports.fastifyFunction = fastifyFunction;
 ```
@@ -213,21 +216,25 @@ Install [Google Functions Framework for
 Node.js](https://github.com/GoogleCloudPlatform/functions-framework-nodejs).
 
 You can install it globally:
+
 ```bash
 npm i -g @google-cloud/functions-framework
 ```
 
 Or as a development library:
+
 ```bash
 npm i -D @google-cloud/functions-framework
 ```
 
 Then you can run your function locally with Functions Framework:
+
 ```bash
 npx @google-cloud/functions-framework --target=fastifyFunction
 ```
 
 Or add this command to your `package.json` scripts:
+
 ```json
 "scripts": {
 ...
@@ -235,21 +242,24 @@ Or add this command to your `package.json` scripts:
 ...
 }
 ```
+
 and run it with `npm run dev`.
 
-
 ### Deploy
+
 ```bash
 gcloud functions deploy fastifyFunction \
 --runtime nodejs14 --trigger-http --region $GOOGLE_REGION --allow-unauthenticated
 ```
 
 #### Read logs
+
 ```bash
 gcloud functions logs read
 ```
 
 #### Example request to `/hello` endpoint
+
 ```bash
 curl -X POST https://$GOOGLE_REGION-$GOOGLE_PROJECT.cloudfunctions.net/me \
   -H "Content-Type: application/json" \
@@ -258,12 +268,13 @@ curl -X POST https://$GOOGLE_REGION-$GOOGLE_PROJECT.cloudfunctions.net/me \
 ```
 
 ### References
-- [Google Cloud Functions - Node.js Quickstart
-  ](https://cloud.google.com/functions/docs/quickstart-nodejs)
+
+-   [Google Cloud Functions - Node.js Quickstart
+    ](https://cloud.google.com/functions/docs/quickstart-nodejs)
 
 ## Google Firebase Functions
 
-Follow this guide if you want to use Fastify as the HTTP framework for 
+Follow this guide if you want to use Fastify as the HTTP framework for
 Firebase Functions instead of the vanilla JavaScript router provided with
 `onRequest(async (req, res) => {}`.
 
@@ -274,25 +285,25 @@ We use the `onRequest` function to wrap our Fastify application instance.
 As such, we'll begin with importing it to the code:
 
 ```js
-const { onRequest } = require("firebase-functions/v2/https")
+const {onRequest} = require('firebase-functions/v2/https');
 ```
 
 ### Creation of Fastify instance
 
 Create the Fastify instance and encapsulate the returned application instance
-in a function which will register routes, await the server's processing of 
+in a function which will register routes, await the server's processing of
 plugins, hooks and other settings. As follows:
 
 ```js
-const fastify = require("fastify")({
-  logger: true,
-})
+const fastify = require('fastify')({
+    logger: true,
+});
 
 const fastifyApp = async (request, reply) => {
-  await registerRoutes(fastify)
-  await fastify.ready()
-  fastify.server.emit("request", request, reply)
-}
+    await registerRoutes(fastify);
+    await fastify.ready();
+    fastify.server.emit('request', request, reply);
+};
 ```
 
 ### Add Custom `contentTypeParser` to Fastify instance and define endpoints
@@ -332,7 +343,7 @@ Final step is to export the Fastify app instance to Firebase's own
 `onRequest()` function so it can pass the request and reply objects to it:
 
 ```js
-exports.app = onRequest(fastifyApp)
+exports.app = onRequest(fastifyApp);
 ```
 
 ### Local test
@@ -366,9 +377,9 @@ firebase functions:log
 ```
 
 ### References
-- [Fastify on Firebase Functions](https://github.com/lirantal/lemon-squeezy-firebase-webhook-fastify/blob/main/package.json)
-- [An article about HTTP webhooks on Firebase Functions and Fastify: A Practical Case Study with Lemon Squeezy](https://lirantal.com/blog/http-webhooks-firebase-functions-fastify-practical-case-study-lemon-squeezy)
 
+-   [Fastify on Firebase Functions](https://github.com/lirantal/lemon-squeezy-firebase-webhook-fastify/blob/main/package.json)
+-   [An article about HTTP webhooks on Firebase Functions and Fastify: A Practical Case Study with Lemon Squeezy](https://lirantal.com/blog/http-webhooks-firebase-functions-fastify-practical-case-study-lemon-squeezy)
 
 ## Google Cloud Run
 
@@ -378,9 +389,9 @@ infrastructure-abstracted environment to run arbitrary containers. As a result,
 Fastify can be deployed to Google Cloud Run with little-to-no code changes from
 the way you would write your Fastify app normally.
 
-*Follow the steps below to deploy to Google Cloud Run if you are already
+_Follow the steps below to deploy to Google Cloud Run if you are already
 familiar with gcloud or just follow their
-[quickstart](https://cloud.google.com/run/docs/quickstarts/build-and-deploy)*.
+[quickstart](https://cloud.google.com/run/docs/quickstarts/build-and-deploy)_.
 
 ### Adjust Fastify server
 
@@ -389,35 +400,35 @@ sure to set the correct port and address:
 
 ```js
 function build() {
-  const fastify = Fastify({ trustProxy: true })
-  return fastify
+    const fastify = Fastify({trustProxy: true});
+    return fastify;
 }
 
 async function start() {
-  // Google Cloud Run will set this environment variable for you, so
-  // you can also use it to detect if you are running in Cloud Run
-  const IS_GOOGLE_CLOUD_RUN = process.env.K_SERVICE !== undefined
+    // Google Cloud Run will set this environment variable for you, so
+    // you can also use it to detect if you are running in Cloud Run
+    const IS_GOOGLE_CLOUD_RUN = process.env.K_SERVICE !== undefined;
 
-  // You must listen on the port Cloud Run provides
-  const port = process.env.PORT || 3000
+    // You must listen on the port Cloud Run provides
+    const port = process.env.PORT || 3000;
 
-  // You must listen on all IPV4 addresses in Cloud Run
-  const host = IS_GOOGLE_CLOUD_RUN ? "0.0.0.0" : undefined
+    // You must listen on all IPV4 addresses in Cloud Run
+    const host = IS_GOOGLE_CLOUD_RUN ? '0.0.0.0' : undefined;
 
-  try {
-    const server = build()
-    const address = await server.listen({ port, host })
-    console.log(`Listening on ${address}`)
-  } catch (err) {
-    console.error(err)
-    process.exit(1)
-  }
+    try {
+        const server = build();
+        const address = await server.listen({port, host});
+        console.log(`Listening on ${address}`);
+    } catch (err) {
+        console.error(err);
+        process.exit(1);
+    }
 }
 
-module.exports = build
+module.exports = build;
 
 if (require.main === module) {
-  start()
+    start();
 }
 ```
 
@@ -482,18 +493,17 @@ gcloud beta run deploy --image gcr.io/PROJECT-ID/APP-NAME --platform managed
 
 Your app will be accessible from the URL GCP provides.
 
-
 ## netlify-lambda
 
 First, please perform all preparation steps related to **AWS Lambda**.
 
-Create a folder called `functions`,  then create `server.js` (and your endpoint
+Create a folder called `functions`, then create `server.js` (and your endpoint
 path will be `server.js`) inside the `functions` folder.
 
 ### functions/server.js
 
 ```js
-export { handler } from '../lambda.js'; // Change `lambda.js` path to your `lambda.js` path
+export {handler} from '../lambda.js'; // Change `lambda.js` path to your `lambda.js` path
 ```
 
 ### netlify.toml
@@ -522,37 +532,37 @@ const env = process.env.NODE_ENV || 'production';
 const dev = env === 'development';
 
 if (dev) {
-  dotenv.config({ allowEmptyValues: true });
+    dotenv.config({allowEmptyValues: true});
 }
 
 module.exports = {
-  mode: env,
-  devtool: dev ? 'eval-source-map' : 'none',
-  externals: [nodeExternals()],
-  devServer: {
-    proxy: {
-      '/.netlify': {
-        target: 'http://localhost:9000',
-        pathRewrite: { '^/.netlify/functions': '' }
-      }
-    }
-  },
-  module: {
-    rules: []
-  },
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env.APP_ROOT_PATH': JSON.stringify('/'),
-      'process.env.NETLIFY_ENV': true,
-      'process.env.CONTEXT': env
-    })
-  ]
+    mode: env,
+    devtool: dev ? 'eval-source-map' : 'none',
+    externals: [nodeExternals()],
+    devServer: {
+        proxy: {
+            '/.netlify': {
+                target: 'http://localhost:9000',
+                pathRewrite: {'^/.netlify/functions': ''},
+            },
+        },
+    },
+    module: {
+        rules: [],
+    },
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env.APP_ROOT_PATH': JSON.stringify('/'),
+            'process.env.NETLIFY_ENV': true,
+            'process.env.CONTEXT': env,
+        }),
+    ],
 };
 ```
 
 ### Scripts
 
-Add this command to your `package.json` *scripts*
+Add this command to your `package.json` _scripts_
 
 ```json
 "scripts": {
@@ -571,7 +581,6 @@ for Node.js applications.
 To use it now, you should wrap your existing Fastify application inside a
 [Platformatic Service](https://oss.platformatic.dev/docs/reference/service/introduction),
 by running the following:
-
 
 ```bash
 npm create platformatic@latest -- service
@@ -626,35 +635,36 @@ file like the following:
 Then, write `api/serverless.js` like so:
 
 ```js
-"use strict";
+'use strict';
 
 // Read the .env file.
-import * as dotenv from "dotenv";
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 // Require the framework
-import Fastify from "fastify";
+import Fastify from 'fastify';
 
 // Instantiate Fastify with some config
 const app = Fastify({
-  logger: true,
+    logger: true,
 });
 
 // Register your application as a normal plugin.
-app.register(import("../src/app.js"));
+app.register(import('../src/app.js'));
 
 export default async (req, res) => {
     await app.ready();
     app.server.emit('request', req, res);
-}
+};
 ```
 
 In `src/app.js` define the plugin.
+
 ```js
-async function routes (fastify, options) {
-  fastify.get('/', async (request, reply) => {
-    return { hello: 'world' }
-  })
+async function routes(fastify, options) {
+    fastify.get('/', async (request, reply) => {
+        return {hello: 'world'};
+    });
 }
 
 export default routes;

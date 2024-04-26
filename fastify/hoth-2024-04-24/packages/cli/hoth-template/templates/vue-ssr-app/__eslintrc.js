@@ -9,9 +9,7 @@ module.exports = {
     overrides: [
         {
             files: ['**.js'],
-            extends: [
-                '@ecomfe/eslint-config',
-            ],
+            extends: ['@ecomfe/eslint-config'],
         },
         {
             files: ['src/**/*.ts'],
@@ -35,10 +33,7 @@ module.exports = {
         },
         {
             files: ['**.vue'],
-            extends: [
-                '@ecomfe/eslint-config',
-                '@ecomfe/eslint-config/vue',
-            ],
+            extends: ['@ecomfe/eslint-config', '@ecomfe/eslint-config/vue'],
             parserOptions: {
                 project: path.resolve(__dirname, './tsconfig.csr.json'),
                 extraFileExtension: ['.vue'],

@@ -12,8 +12,7 @@ export default function (line: string) {
             level: o.level,
             result: flatstr(format(tokens, o)),
         };
-    }
-    catch (e) {
+    } catch (e) {
         return {
             app: 'hoth',
             level: 10,

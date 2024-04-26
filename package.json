@@ -5,9 +5,13 @@
     "main": "index.js",
     "scripts": {
         "install": "node cli/install.js",
-        "re-install": "node cli/delete-dependencies.js && node cli/install.js"
+        "re-install": "node cli/delete-dependencies.js && node cli/install.js",
+        "prettier": "prettier . --write"
     },
     "keywords": [],
     "author": "",
-    "license": "ISC"
+    "license": "ISC",
+    "devDependencies": {
+        "prettier": "^3.2.5"
+    }
 }

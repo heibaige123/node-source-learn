@@ -11,11 +11,9 @@ declare module 'fastify' {
         test?: Record<string, unknown>;
         realPlugin?: Record<string, unknown>;
     }
-};
-
+}
 
 describe('@hoth/app-autoload pluginLoader', () => {
-
     let fastifyInstance: FastifyInstance;
 
     beforeEach(() => {
@@ -29,7 +27,7 @@ describe('@hoth/app-autoload pluginLoader', () => {
             dir: path.join(__dirname, 'fixtures/plugins/simple'),
             options: {
                 init: 1,
-            }
+            },
         });
 
         expect(fastifyInstance.foo).toEqual({
@@ -46,21 +44,22 @@ describe('@hoth/app-autoload pluginLoader', () => {
     it('symlink file', async () => {
         await symlink(
             path.join(__dirname, 'fixtures/plugins/realPlugin.js'),
-            path.join(__dirname, 'fixtures/plugins/empty/realPlugin.js')
+            path.join(__dirname, 'fixtures/plugins/empty/realPlugin.js'),
         );
 
         await fastifyInstance.register(pluginLoader, {
             dir: path.join(__dirname, 'fixtures/plugins/empty'),
             options: {
                 init: 1,
-            }
+            },
         });
 
         expect(fastifyInstance.realPlugin).toEqual({
             realPlugin: 1,
             init: 1,
         });
-        await unlink(path.join(__dirname, 'fixtures/plugins/empty/realPlugin.js'));
+        await unlink(
+            path.join(__dirname, 'fixtures/plugins/empty/realPlugin.js'),
+        );
     });
-
 });

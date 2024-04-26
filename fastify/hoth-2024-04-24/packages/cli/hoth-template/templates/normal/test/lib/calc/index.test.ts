@@ -12,7 +12,6 @@ describe('Service: AuthService', () => {
     afterEach(() => jest.restoreAllMocks());
 
     it('add', async () => {
-
         const result = service.add(1, 2);
 
         expect(result).toBe(3);

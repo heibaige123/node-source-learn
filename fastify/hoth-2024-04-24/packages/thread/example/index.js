@@ -5,22 +5,22 @@ const path = require('path');
 process.env.ROOT_PATH = __dirname;
 
 const app = fastify({
-    logger: true
+    logger: true,
 });
 
 app.register(threadPlugin, {
     threadsNumber: 1,
     filename: path.resolve(__dirname, './worker.js'),
     logConfig: {
-        appName: 'meixg'
+        appName: 'meixg',
     },
     warmupConfig: {
         warmupData: ['a.json'],
-        basePath: path.resolve(__dirname, './warmupData')
-    }
+        basePath: path.resolve(__dirname, './warmupData'),
+    },
 });
 
-app.register(async instance => {
+app.register(async (instance) => {
     instance.get('/a', async () => {
         // @ts-ignore
         return instance.runTask('a');

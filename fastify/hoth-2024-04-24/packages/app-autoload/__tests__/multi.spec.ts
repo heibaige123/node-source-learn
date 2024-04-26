@@ -47,7 +47,7 @@ describe('@hoth/app-autoload multi app', () => {
 
         let response = await fastify.inject({
             method: 'GET',
-            path: '/demo/app'
+            path: '/demo/app',
         });
 
         expect(response.statusCode).toBe(200);
@@ -55,11 +55,10 @@ describe('@hoth/app-autoload multi app', () => {
 
         response = await fastify.inject({
             method: 'GET',
-            path: '/another/app'
+            path: '/another/app',
         });
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toBe('ok!');
     });
-
 });

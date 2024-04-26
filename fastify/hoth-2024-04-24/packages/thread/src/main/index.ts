@@ -3,8 +3,10 @@ import type {FastifyInstance} from 'fastify';
 import type {PluginOptions} from '../../types';
 import {initThread} from './initThread';
 
-async function threadPluginInner(fastify: FastifyInstance, options: PluginOptions) {
-
+async function threadPluginInner(
+    fastify: FastifyInstance,
+    options: PluginOptions,
+) {
     const pool = await initThread(options);
 
     fastify.decorate('piscina', pool);
@@ -19,7 +21,4 @@ export const threadPlugin = fp(threadPluginInner, {
 
 export {initThread} from './initThread';
 
-export type {
-    PluginOptions,
-    HothThreadConf
-} from '../../types';
+export type {PluginOptions, HothThreadConf} from '../../types';

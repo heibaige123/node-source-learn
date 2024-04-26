@@ -10,5 +10,5 @@ module.exports = {
         '^fastify-decorators/plugins$': 'fastify-decorators/plugins/index.cjs',
         '^fastify-decorators$': 'fastify-decorators/index.cjs',
     },
-    coveragePathIgnorePatterns: ['dist']
+    coveragePathIgnorePatterns: ['dist'],
 };

@@ -4,7 +4,6 @@ const webpack = require('webpack');
 const isServer = !!process.env.SSR;
 
 module.exports = {
-
     publicPath: '/__appName__/',
 
     assetsDir: isServer ? 'ssr' : 'static',
@@ -17,7 +16,7 @@ module.exports = {
 
     filenameHashing: !isServer,
 
-    chainWebpack: webpackConfig => {
+    chainWebpack: (webpackConfig) => {
         // We need to disable cache loader, otherwise the client build
         // will used cached components from the server build
         webpackConfig.module.rule('vue').uses.delete('cache-loader');
@@ -27,29 +26,25 @@ module.exports = {
         webpackConfig.module
             .rule('ts')
             .use('ts-loader')
-            .tap(options => {
+            .tap((options) => {
                 return {
                     ...options,
-                    configFile: isServer ? './tsconfig.ssr.json' : './tsconfig.csr.json',
+                    configFile: isServer
+                        ? './tsconfig.ssr.json'
+                        : './tsconfig.csr.json',
                 };
             });
 
         if (!isServer) {
             // Point entry to your app's client entry file
-            webpackConfig
-                .entry('app')
-                .clear()
-                .add('./src/entry-client.ts');
+            webpackConfig.entry('app').clear().add('./src/entry-client.ts');
             return;
         }
 
         webpackConfig.plugins.delete('html');
 
         // Point entry to your app's server entry file
-        webpackConfig
-            .entry('app')
-            .clear()
-            .add('./src/entry-server.ts');
+        webpackConfig.entry('app').clear().add('./src/entry-server.ts');
 
         // This allows webpack to handle dynamic imports in a Node-appropriate
         // fashion, and also tells `vue-loader` to emit server-oriented code when
@@ -77,7 +72,7 @@ module.exports = {
         webpackConfig.plugin('limit').use(
             new webpack.optimize.LimitChunkCountPlugin({
                 maxChunks: 1,
-            })
+            }),
         );
     },
 };

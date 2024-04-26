@@ -3,7 +3,6 @@ import view from '../src/index';
 import Swig from 'swig';
 
 describe('reply.render with swig engine', () => {
-
     it('simple output', async () => {
         const fastifyInstance = fastify();
         const data = {title: 'fastify', text: 'text'};
@@ -21,12 +20,14 @@ describe('reply.render with swig engine', () => {
 
         const response = await fastifyInstance.inject({
             method: 'GET',
-            path: '/'
+            path: '/',
         });
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toBe('<h1>fastify</h1>\n<p>text</p>');
-        expect(response.headers['content-type']).toBe('text/html; charset=utf-8');
+        expect(response.headers['content-type']).toBe(
+            'text/html; charset=utf-8',
+        );
     });
 
     it('missing engine', async () => {
@@ -38,8 +39,7 @@ describe('reply.render with swig engine', () => {
             await fastifyInstance.register(view, {
                 templatesDir: __dirname,
             });
-        }
-        catch (e) {
+        } catch (e) {
             throwError = e;
         }
 
@@ -59,12 +59,11 @@ describe('reply.render with swig engine', () => {
                 },
                 templatesDir: __dirname,
             });
-        }
-        catch (e) {
+        } catch (e) {
             throwError = e;
         }
 
-        expect(throwError.message).toBe('\'foo\' not yet supported');
+        expect(throwError.message).toBe("'foo' not yet supported");
     });
 
     it('$appConfig', async () => {
@@ -75,13 +74,13 @@ describe('reply.render with swig engine', () => {
             get(name: string) {
                 mock(name);
                 return __dirname;
-            }
+            },
         };
 
         await fastifyInstance.register(view, {
             engine: {
                 swig: Swig,
-            }
+            },
         });
 
         expect(mock).toHaveBeenCalledWith('dir');
@@ -93,19 +92,21 @@ describe('reply.render with swig engine', () => {
 
         const response = await fastifyInstance.inject({
             method: 'GET',
-            path: '/'
+            path: '/',
         });
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toBe('<h1>fastify</h1>\n<span>text</span>');
-        expect(response.headers['content-type']).toBe('text/html; charset=utf-8');
+        expect(response.headers['content-type']).toBe(
+            'text/html; charset=utf-8',
+        );
     });
 
     it('simple output', async () => {
         const fastifyInstance = fastify();
         const data = {
             title: 'fastify',
-            text: 'text'
+            text: 'text',
         };
 
         fastifyInstance.register(view, {
@@ -116,60 +117,78 @@ describe('reply.render with swig engine', () => {
             renderOnly: true,
         });
 
-        fastifyInstance.get('/', async (req: FastifyRequest, reply: FastifyReply) => {
-            const html = await reply.render('templates/index.swig', data);
-            expect(html).toBe('<h1>fastify</h1>\n<p>text</p>');
-            reply.header('content-type', 'text/html; charset=utf-8');
-            reply.send(html);
-        });
+        fastifyInstance.get(
+            '/',
+            async (req: FastifyRequest, reply: FastifyReply) => {
+                const html = await reply.render('templates/index.swig', data);
+                expect(html).toBe('<h1>fastify</h1>\n<p>text</p>');
+                reply.header('content-type', 'text/html; charset=utf-8');
+                reply.send(html);
+            },
+        );
 
         const response = await fastifyInstance.inject({
             method: 'GET',
-            path: '/'
+            path: '/',
         });
         expect(response.statusCode).toBe(200);
         expect(response.body).toBe('<h1>fastify</h1>\n<p>text</p>');
-        expect(response.headers['content-type']).toBe('text/html; charset=utf-8');
+        expect(response.headers['content-type']).toBe(
+            'text/html; charset=utf-8',
+        );
     });
 
     it('render with cb', async () => {
         const fastifyInstance = fastify();
         const data = {
             title: 'fastify',
-            text: 'text'
+            text: 'text',
         };
 
         fastifyInstance.register(view, {
             engine: {
                 swig: Swig,
             },
-            templatesDir: __dirname
+            templatesDir: __dirname,
         });
 
-        fastifyInstance.get('/', async (req: FastifyRequest, reply: FastifyReply) => {
-            const renderPage = () => {
-                return new Promise(function (resolve, reject) {
-                    reply.render('templates/index.swig', data, function (err, html) {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
-                        resolve(html + '<p>cbRender</p>');
+        fastifyInstance.get(
+            '/',
+            async (req: FastifyRequest, reply: FastifyReply) => {
+                const renderPage = () => {
+                    return new Promise(function (resolve, reject) {
+                        reply.render(
+                            'templates/index.swig',
+                            data,
+                            function (err, html) {
+                                if (err) {
+                                    reject(err);
+                                    return;
+                                }
+                                resolve(html + '<p>cbRender</p>');
+                            },
+                        );
                     });
-                });
-            };
-            const html = await renderPage();
-            expect(html).toBe('<h1>fastify</h1>\n<p>text</p><p>cbRender</p>');
-            reply.header('content-type', 'text/html; charset=utf-8');
-            reply.send(html);
-        });
+                };
+                const html = await renderPage();
+                expect(html).toBe(
+                    '<h1>fastify</h1>\n<p>text</p><p>cbRender</p>',
+                );
+                reply.header('content-type', 'text/html; charset=utf-8');
+                reply.send(html);
+            },
+        );
 
         const response = await fastifyInstance.inject({
             method: 'GET',
-            path: '/'
+            path: '/',
         });
         expect(response.statusCode).toBe(200);
-        expect(response.body).toBe('<h1>fastify</h1>\n<p>text</p><p>cbRender</p>');
-        expect(response.headers['content-type']).toBe('text/html; charset=utf-8');
+        expect(response.body).toBe(
+            '<h1>fastify</h1>\n<p>text</p><p>cbRender</p>',
+        );
+        expect(response.headers['content-type']).toBe(
+            'text/html; charset=utf-8',
+        );
     });
 });

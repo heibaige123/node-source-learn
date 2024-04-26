@@ -1,6 +1,6 @@
 module.exports = {
     warmupData: {
-        '/foo': 'a.json'
+        '/foo': 'a.json',
     },
-    maxConcurrent: 3
+    maxConcurrent: 3,
 };

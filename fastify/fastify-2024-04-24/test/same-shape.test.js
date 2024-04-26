@@ -1,124 +1,124 @@
-'use strict'
+'use strict';
 
-const { test } = require('tap')
-const fastify = require('..')
+const {test} = require('tap');
+const fastify = require('..');
 
 test('same shape on Request', async (t) => {
-  t.plan(1)
+    t.plan(1);
 
-  const app = fastify()
+    const app = fastify();
 
-  let request
+    let request;
 
-  app.decorateRequest('user')
+    app.decorateRequest('user');
 
-  app.addHook('preHandler', (req, reply, done) => {
-    if (request) {
-      req.user = 'User'
-    }
-    done()
-  })
+    app.addHook('preHandler', (req, reply, done) => {
+        if (request) {
+            req.user = 'User';
+        }
+        done();
+    });
 
-  app.get('/', (req, reply) => {
-    if (request) {
-      t.equal(%HaveSameMap(request, req), true)
-    }
+    app.get('/', (req, reply) => {
+        if (request) {
+            t.equal(%HaveSameMap(request, req), true);
+        }
 
-    request = req
+        request = req;
 
-    return 'hello world'
-  })
+        return 'hello world';
+    });
 
-  await app.inject('/')
-  await app.inject('/')
-})
+    await app.inject('/');
+    await app.inject('/');
+});
 
 test('same shape on Request when object', async (t) => {
-  t.plan(1)
+    t.plan(1);
 
-  const app = fastify()
+    const app = fastify();
 
-  let request
+    let request;
 
-  app.decorateRequest('object', null)
+    app.decorateRequest('object', null);
 
-  app.addHook('preHandler', (req, reply, done) => {
-    if (request) {
-      req.object = {}
-    }
-    done()
-  })
+    app.addHook('preHandler', (req, reply, done) => {
+        if (request) {
+            req.object = {};
+        }
+        done();
+    });
 
-  app.get('/', (req, reply) => {
-    if (request) {
-      t.equal(%HaveSameMap(request, req), true)
-    }
+    app.get('/', (req, reply) => {
+        if (request) {
+            t.equal(%HaveSameMap(request, req), true);
+        }
 
-    request = req
+        request = req;
 
-    return 'hello world'
-  })
+        return 'hello world';
+    });
 
-  await app.inject('/')
-  await app.inject('/')
-})
+    await app.inject('/');
+    await app.inject('/');
+});
 
 test('same shape on Reply', async (t) => {
-  t.plan(1)
+    t.plan(1);
 
-  const app = fastify()
+    const app = fastify();
 
-  let _reply
+    let _reply;
 
-  app.decorateReply('user')
+    app.decorateReply('user');
 
-  app.addHook('preHandler', (req, reply, done) => {
-    if (_reply) {
-      reply.user = 'User'
-    }
-    done()
-  })
+    app.addHook('preHandler', (req, reply, done) => {
+        if (_reply) {
+            reply.user = 'User';
+        }
+        done();
+    });
 
-  app.get('/', (req, reply) => {
-    if (_reply) {
-      t.equal(%HaveSameMap(_reply, reply), true)
-    }
+    app.get('/', (req, reply) => {
+        if (_reply) {
+            t.equal(%HaveSameMap(_reply, reply), true);
+        }
 
-    _reply = reply
+        _reply = reply;
 
-    return 'hello world'
-  })
+        return 'hello world';
+    });
 
-  await app.inject('/')
-  await app.inject('/')
-})
+    await app.inject('/');
+    await app.inject('/');
+});
 
 test('same shape on Reply when object', async (t) => {
-  t.plan(1)
+    t.plan(1);
 
-  const app = fastify()
+    const app = fastify();
 
-  let _reply
+    let _reply;
 
-  app.decorateReply('object', null)
+    app.decorateReply('object', null);
 
-  app.addHook('preHandler', (req, reply, done) => {
-    if (_reply) {
-      reply.object = {}
-    }
-    done()
-  })
+    app.addHook('preHandler', (req, reply, done) => {
+        if (_reply) {
+            reply.object = {};
+        }
+        done();
+    });
 
-  app.get('/', (req, reply) => {
-    if (_reply) {
-      t.equal(%HaveSameMap(_reply, reply), true)
-    }
+    app.get('/', (req, reply) => {
+        if (_reply) {
+            t.equal(%HaveSameMap(_reply, reply), true);
+        }
 
-    _reply = reply
+        _reply = reply;
 
-    return 'hello world'
-  })
+        return 'hello world';
+    });
 
-  await app.inject('/')
-  await app.inject('/')
-})
+    await app.inject('/');
+    await app.inject('/');
+});

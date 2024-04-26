@@ -1,33 +1,33 @@
 {
-  "name": "@hoth/utils",
-  "version": "1.2.0",
-  "description": "utils plugin for hoth framework",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "tsc --build tsconfig.json"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/searchfe/hoth.git"
-  },
-  "keywords": [
-    "utils"
-  ],
-  "author": "cxtom (cxtom2008@gmail.com)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/cxtom/hoth/issues"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "homepage": "https://github.com/cxtom/hoth#readme",
-  "dependencies": {
-    "resolve-from": "^5.0.0",
-    "tslib": "^2.1.0"
-  },
-  "files": [
-    "dist"
-  ],
-  "gitHead": "0735cada835eabb2ac787ca1c5f2ff4bb8310fe2"
+    "name": "@hoth/utils",
+    "version": "1.2.0",
+    "description": "utils plugin for hoth framework",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc --build tsconfig.json"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/searchfe/hoth.git"
+    },
+    "keywords": [
+        "utils"
+    ],
+    "author": "cxtom (cxtom2008@gmail.com)",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/cxtom/hoth/issues"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "homepage": "https://github.com/cxtom/hoth#readme",
+    "dependencies": {
+        "resolve-from": "^5.0.0",
+        "tslib": "^2.1.0"
+    },
+    "files": [
+        "dist"
+    ],
+    "gitHead": "0735cada835eabb2ac787ca1c5f2ff4bb8310fe2"
 }

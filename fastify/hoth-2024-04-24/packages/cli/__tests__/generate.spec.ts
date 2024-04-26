@@ -12,7 +12,6 @@ import {fs as utilsFs} from '@hoth/utils';
 const workdir = path.join(__dirname, 'workdir');
 
 describe('hoth cli generate', () => {
-
     jest.mock('inquirer');
 
     beforeEach(() => {
@@ -26,18 +25,22 @@ describe('hoth cli generate', () => {
         await cli([workdir]);
 
         expect(mockExit).toHaveBeenCalledWith(1);
-        expect(mockLog).toHaveBeenCalledWith(`Warn: directory ${workdir} already exists`);
+        expect(mockLog).toHaveBeenCalledWith(
+            `Warn: directory ${workdir} already exists`,
+        );
 
         mockExit.mockRestore();
         mockLog.mockRestore();
     });
 
-    it('errors if generate doesn\'t have <folder> arguments', async () => {
+    it("errors if generate doesn't have <folder> arguments", async () => {
         const mockExit = mockProcessExit();
         const mockLog = mockConsoleLog();
         await cli([]);
         expect(mockExit).toHaveBeenCalledWith(1);
-        expect(mockLog).toHaveBeenCalledWith('Warn: must specify a directory to \'hoth generate\'');
+        expect(mockLog).toHaveBeenCalledWith(
+            "Warn: must specify a directory to 'hoth generate'",
+        );
 
         mockExit.mockRestore();
         mockLog.mockRestore();
@@ -47,7 +50,7 @@ describe('hoth cli generate', () => {
         // @ts-ignore
         inquirer.prompt = jest.fn().mockResolvedValue({
             appName: 'myapp',
-            appType: 'Normal'
+            appType: 'Normal',
         });
         const mockLog = mockConsoleLog();
         await cli([workdir]);
@@ -64,7 +67,7 @@ describe('hoth cli generate', () => {
         // @ts-ignore
         inquirer.prompt = jest.fn().mockResolvedValue({
             appName: 'myapp',
-            appType: 'Normal'
+            appType: 'Normal',
         });
         const mockLog = mockConsoleLog();
         await cli([workdir]);
@@ -80,11 +83,11 @@ describe('hoth cli generate', () => {
 
     it('default app name', async () => {
         // @ts-ignore
-        inquirer.prompt = jest.fn().mockImplementation(list => {
+        inquirer.prompt = jest.fn().mockImplementation((list) => {
             const app = list[0];
             return {
                 appName: app.default(),
-                appType: 'Normal'
+                appType: 'Normal',
             };
         });
         const mockLog = mockConsoleLog();
@@ -96,12 +99,14 @@ describe('hoth cli generate', () => {
 
     it('validate app name', async () => {
         // @ts-ignore
-        inquirer.prompt = jest.fn().mockImplementation(list => {
+        inquirer.prompt = jest.fn().mockImplementation((list) => {
             expect(list[0].validate('my-app')).toBe(true);
-            expect(list[0].validate('my*app')).toBe('Please enter a valid product name.');
+            expect(list[0].validate('my*app')).toBe(
+                'Please enter a valid product name.',
+            );
             return {
                 appName: 'myapp',
-                appType: 'Normal'
+                appType: 'Normal',
             };
         });
         const mockLog = mockConsoleLog();
@@ -113,7 +118,7 @@ describe('hoth cli generate', () => {
         // @ts-ignore
         inquirer.prompt = jest.fn().mockResolvedValue({
             appName: 'myapp',
-            appType: 'Normal'
+            appType: 'Normal',
         });
 
         const mockLog = mockConsoleLog();
@@ -130,8 +135,12 @@ describe('hoth cli generate', () => {
         json.description = 'test';
         writeFileSync(jsonfile, JSON.stringify(json));
 
-
-        await cli([workdir, '--sub-app', '--repo', 'https://github.com/searchfe/hoth-template']);
+        await cli([
+            workdir,
+            '--sub-app',
+            '--repo',
+            'https://github.com/searchfe/hoth-template',
+        ]);
 
         const pkg = await utilsFs.readJson(`${workdir}/package.json`);
         expect(pkg.name).toBe('@baidu/myapp-node-ui');
@@ -147,7 +156,7 @@ describe('hoth cli generate', () => {
         // @ts-ignore
         inquirer.prompt = jest.fn().mockResolvedValue({
             appName: 'myapp',
-            appType: 'Normal'
+            appType: 'Normal',
         });
 
         const mockLog = mockConsoleLog();
@@ -161,5 +170,4 @@ describe('hoth cli generate', () => {
 
         mockLog.mockRestore();
     });
-
 });

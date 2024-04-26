@@ -1,5 +1,5 @@
-const { exec } = require('child_process');
-const { getSecondDir } = require('./utils');
+const {exec} = require('child_process');
+const {getSecondDir} = require('./utils');
 
 getSecondDir().then((dirs) => {
     dirs.forEach((dir) => {

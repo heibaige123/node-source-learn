@@ -7,7 +7,6 @@ import fastify from 'fastify';
 import {fs} from '@hoth/utils';
 
 describe('@hoth/logger logger', function () {
-
     process.env.HOTH_IDC = 'all';
     process.env.HOTH_CLUSTER = 'test';
 
@@ -21,9 +20,9 @@ describe('@hoth/logger logger', function () {
         rootPath,
         apps: [
             {
-                name: 'test'
-            }
-        ]
+                name: 'test',
+            },
+        ],
     });
 
     const app = fastify({
@@ -39,7 +38,7 @@ describe('@hoth/logger logger', function () {
         req.log.notice({
             app: 'test',
             req,
-            reply
+            reply,
         });
         reply.send('ok');
     });
@@ -50,13 +49,16 @@ describe('@hoth/logger logger', function () {
         await fs.rm(rootPath, {recursive: true, force: true});
     });
 
-    it('test', async done => {
+    it('test', async (done) => {
         await app.inject({
             method: 'GET',
-            path: '/test/xx'
+            path: '/test/xx',
         });
         setTimeout(() => {
-            const log = readFileSync(join(rootPath, 'log/test/test.log.2021020100'), 'utf8');
+            const log = readFileSync(
+                join(rootPath, 'log/test/test.log.2021020100'),
+                'utf8',
+            );
             expect(log).toContain('NOTICE: 2021-02-01 00:00:00');
             expect(log).toContain('foo[xx]');
             expect(log).toContain('tm[func1:2:30.0]');

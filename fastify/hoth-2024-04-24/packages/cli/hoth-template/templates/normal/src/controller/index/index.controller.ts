@@ -4,7 +4,6 @@ import Calculator from '../../lib/calc/index.service';
 
 @Controller('/index')
 export default class AppController {
-
     @Inject(Calculator)
     private readonly service!: Calculator;
 

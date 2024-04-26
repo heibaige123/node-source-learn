@@ -45,16 +45,16 @@ properties that are present on the native objects but not the Fastify objects.
 
 ```js
 const fastify = require('fastify')({
-  logger: {
-    serializers: {
-      res(res) {
-        return {
-          statusCode: res.statusCode,
-          customProp: res.customProp
-        };
-      }
-    }
-  }
+    logger: {
+        serializers: {
+            res(res) {
+                return {
+                    statusCode: res.statusCode,
+                    customProp: res.customProp,
+                };
+            },
+        },
+    },
 });
 ```
 
@@ -62,16 +62,16 @@ const fastify = require('fastify')({
 
 ```js
 const fastify = require('fastify')({
-  logger: {
-    serializers: {
-      res(reply) {
-        return {
-          statusCode: reply.statusCode, // No change required
-          customProp: reply.raw.customProp // Log custom property from res object
-        };
-      }
-    }
-  }
+    logger: {
+        serializers: {
+            res(reply) {
+                return {
+                    statusCode: reply.statusCode, // No change required
+                    customProp: reply.raw.customProp, // Log custom property from res object
+                };
+            },
+        },
+    },
 });
 ```
 
@@ -87,20 +87,20 @@ v3](https://dev.to/eomm/validation-and-serialization-in-fastify-v3-2e8l).
 
 ```js
 const schema = {
-  body: 'schemaId#'
+    body: 'schemaId#',
 };
-fastify.route({ method, url, schema, handler });
+fastify.route({method, url, schema, handler});
 ```
 
 **v3:**
 
 ```js
 const schema = {
-  body: {
-    $ref: 'schemaId#'
-  }
+    body: {
+        $ref: 'schemaId#',
+    },
 };
-fastify.route({ method, url, schema, handler });
+fastify.route({method, url, schema, handler});
 ```
 
 ### Changed schema validation options ([#2023](https://github.com/fastify/fastify/pull/2023))
@@ -118,8 +118,8 @@ const ajv = new AJV();
 ajv.addSchema(schemaA);
 ajv.addSchema(schemaB);
 
-fastify.setSchemaCompiler(schema => ajv.compile(schema));
-fastify.setSchemaResolver(ref => ajv.getSchema(ref).schema);
+fastify.setSchemaCompiler((schema) => ajv.compile(schema));
+fastify.setSchemaResolver((ref) => ajv.getSchema(ref).schema);
 ```
 
 **v3:**
@@ -130,8 +130,8 @@ const ajv = new AJV();
 ajv.addSchema(schemaA);
 ajv.addSchema(schemaB);
 
-fastify.setValidatorCompiler(({ schema, method, url, httpPart }) =>
-  ajv.compile(schema)
+fastify.setValidatorCompiler(({schema, method, url, httpPart}) =>
+    ajv.compile(schema),
 );
 ```
 
@@ -162,12 +162,12 @@ The old syntax of Fastify v2 without payload is supported but it is deprecated.
 From Fastify v3, the behavior of `onRoute` and `onRegister` hooks will change
 slightly to support hook encapsulation.
 
-- `onRoute` - The hook will be called asynchronously. The hook is now inherited
-  when registering a new plugin within the same encapsulation scope. Thus, this
-  hook should be registered _before_ registering any plugins.
-- `onRegister` - Same as the onRoute hook. The only difference is that now the
-  very first call will no longer be the framework itself, but the first
-  registered plugin.
+-   `onRoute` - The hook will be called asynchronously. The hook is now inherited
+    when registering a new plugin within the same encapsulation scope. Thus, this
+    hook should be registered _before_ registering any plugins.
+-   `onRegister` - Same as the onRoute hook. The only difference is that now the
+    very first call will no longer be the framework itself, but the first
+    registered plugin.
 
 ### Changed Content Type Parser syntax ([#2286](https://github.com/fastify/fastify/pull/2286))
 
@@ -192,30 +192,30 @@ as a request body, querystring, and more!
 
 ```ts
 interface PingQuerystring {
-  foo?: number;
+    foo?: number;
 }
 
 interface PingParams {
-  bar?: string;
+    bar?: string;
 }
 
 interface PingHeaders {
-  a?: string;
+    a?: string;
 }
 
 interface PingBody {
-  baz?: string;
+    baz?: string;
 }
 
 server.get<PingQuerystring, PingParams, PingHeaders, PingBody>(
-  '/ping/:bar',
-  opts,
-  (request, reply) => {
-    console.log(request.query); // This is of type `PingQuerystring`
-    console.log(request.params); // This is of type `PingParams`
-    console.log(request.headers); // This is of type `PingHeaders`
-    console.log(request.body); // This is of type `PingBody`
-  }
+    '/ping/:bar',
+    opts,
+    (request, reply) => {
+        console.log(request.query); // This is of type `PingQuerystring`
+        console.log(request.params); // This is of type `PingParams`
+        console.log(request.headers); // This is of type `PingHeaders`
+        console.log(request.body); // This is of type `PingBody`
+    },
 );
 ```
 
@@ -223,15 +223,15 @@ server.get<PingQuerystring, PingParams, PingHeaders, PingBody>(
 
 ```ts
 server.get<{
-  Querystring: PingQuerystring;
-  Params: PingParams;
-  Headers: PingHeaders;
-  Body: PingBody;
+    Querystring: PingQuerystring;
+    Params: PingParams;
+    Headers: PingHeaders;
+    Body: PingBody;
 }>('/ping/:bar', opts, async (request, reply) => {
-  console.log(request.query); // This is of type `PingQuerystring`
-  console.log(request.params); // This is of type `PingParams`
-  console.log(request.headers); // This is of type `PingHeaders`
-  console.log(request.body); // This is of type `PingBody`
+    console.log(request.query); // This is of type `PingQuerystring`
+    console.log(request.params); // This is of type `PingParams`
+    console.log(request.headers); // This is of type `PingHeaders`
+    console.log(request.body); // This is of type `PingBody`
 });
 ```
 
@@ -245,43 +245,43 @@ all unexpected errors in sync and async routes are managed.
 
 ```js
 fastify.setErrorHandler((error, request, reply) => {
-  // this is NOT called
-  reply.send(error)
-})
+    // this is NOT called
+    reply.send(error);
+});
 fastify.get('/', (request, reply) => {
-  const maybeAnArray = request.body.something ? [] : 'I am a string'
-  maybeAnArray.substr() // Thrown: [].substr is not a function and crash the server
-})
+    const maybeAnArray = request.body.something ? [] : 'I am a string';
+    maybeAnArray.substr(); // Thrown: [].substr is not a function and crash the server
+});
 ```
 
 **v3:**
 
 ```js
 fastify.setErrorHandler((error, request, reply) => {
-  // this IS called
-  reply.send(error)
-})
+    // this IS called
+    reply.send(error);
+});
 fastify.get('/', (request, reply) => {
-  const maybeAnArray = request.body.something ? [] : 'I am a string'
-  maybeAnArray.substr() // Thrown: [].substr is not a function, but it is handled
-})
+    const maybeAnArray = request.body.something ? [] : 'I am a string';
+    maybeAnArray.substr(); // Thrown: [].substr is not a function, but it is handled
+});
 ```
 
 ## Further additions and improvements
 
-- Hooks now have consistent context regardless of how they are registered
-  ([#2005](https://github.com/fastify/fastify/pull/2005))
-- Deprecated `request.req` and `reply.res` for
-  [`request.raw`](../Reference/Request.md) and
-  [`reply.raw`](../Reference/Reply.md)
-  ([#2008](https://github.com/fastify/fastify/pull/2008))
-- Removed `modifyCoreObjects` option
-  ([#2015](https://github.com/fastify/fastify/pull/2015))
-- Added [`connectionTimeout`](../Reference/Server.md#factory-connection-timeout)
-  option ([#2086](https://github.com/fastify/fastify/pull/2086))
-- Added [`keepAliveTimeout`](../Reference/Server.md#factory-keep-alive-timeout)
-  option ([#2086](https://github.com/fastify/fastify/pull/2086))
-- Added async-await support for [plugins](../Reference/Plugins.md#async-await)
-  ([#2093](https://github.com/fastify/fastify/pull/2093))
-- Added the feature to throw object as error
-  ([#2134](https://github.com/fastify/fastify/pull/2134))
+-   Hooks now have consistent context regardless of how they are registered
+    ([#2005](https://github.com/fastify/fastify/pull/2005))
+-   Deprecated `request.req` and `reply.res` for
+    [`request.raw`](../Reference/Request.md) and
+    [`reply.raw`](../Reference/Reply.md)
+    ([#2008](https://github.com/fastify/fastify/pull/2008))
+-   Removed `modifyCoreObjects` option
+    ([#2015](https://github.com/fastify/fastify/pull/2015))
+-   Added [`connectionTimeout`](../Reference/Server.md#factory-connection-timeout)
+    option ([#2086](https://github.com/fastify/fastify/pull/2086))
+-   Added [`keepAliveTimeout`](../Reference/Server.md#factory-keep-alive-timeout)
+    option ([#2086](https://github.com/fastify/fastify/pull/2086))
+-   Added async-await support for [plugins](../Reference/Plugins.md#async-await)
+    ([#2093](https://github.com/fastify/fastify/pull/2093))
+-   Added the feature to throw object as error
+    ([#2134](https://github.com/fastify/fastify/pull/2134))

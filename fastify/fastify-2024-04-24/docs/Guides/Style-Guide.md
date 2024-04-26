@@ -2,7 +2,7 @@
 
 ## Welcome
 
-Welcome to *Fastify Style Guide*. This guide is here to provide you with a
+Welcome to _Fastify Style Guide_. This guide is here to provide you with a
 conventional writing style for users writing developer documentation on our Open
 Source framework. Each topic is precise and well explained to help you write
 documentation users can easily understand and implement.
@@ -22,13 +22,13 @@ file on GitHub to join our Open Source folks.
 
 You need to know the following:
 
-* JavaScript
-* Node.js
-* Git
-* GitHub
-* Markdown
-* HTTP
-* NPM
+-   JavaScript
+-   Node.js
+-   Git
+-   GitHub
+-   Markdown
+-   HTTP
+-   NPM
 
 ### Consider your Audience
 
@@ -60,7 +60,6 @@ static path.
 
 ### Avoid adding video or image content
 
-
 Do not add videos or screenshots to the documentation. It is easier to keep
 under version control. Videos and images will eventually end up becoming
 outdated as new updates keep developing. Instead, make a referral link or a
@@ -74,10 +73,9 @@ To learn more about hooks, see [Fastify hooks](https://fastify.dev/docs/latest/R
 ```
 
 Result:
->To learn more about hooks, see [Fastify
->hooks](https://fastify.dev/docs/latest/Reference/Hooks/).
 
-
+> To learn more about hooks, see [Fastify
+> hooks](https://fastify.dev/docs/latest/Reference/Hooks/).
 
 ### Avoid plagiarism
 
@@ -85,13 +83,11 @@ Make sure you avoid copying other people's work. Keep it as original as
 possible. You can learn from what they have done and reference where it is from
 if you used a particular quote from their work.
 
-
 ## Word Choice
 
 There are a few things you need to use and avoid when writing your documentation
 to improve readability for readers and make documentation neat, direct, and
 clean.
-
 
 ### When to use the second person "you" as the pronoun
 
@@ -106,7 +102,7 @@ Less like this: we can use the following plugins.
 
 More like this: You can use the following plugins.
 
-> According to [Wikipedia](#), ***You*** is usually a second person pronoun.
+> According to [Wikipedia](#), **_You_** is usually a second person pronoun.
 > Also, used to refer to an indeterminate person, as a more common alternative
 > to a very formal indefinite pronoun.
 
@@ -126,7 +122,6 @@ referenced.
 To view a live example, refer to the [Decorators](../Reference/Decorators.md)
 reference document.
 
-
 ### Avoid using contractions
 
 Contractions are the shortened version of written and spoken forms of a word,
@@ -137,16 +132,15 @@ formal tone.
 
 Condescending terms are words that include:
 
-* Just
-* Easy
-* Simply
-* Basically
-* Obviously
+-   Just
+-   Easy
+-   Simply
+-   Basically
+-   Obviously
 
 The reader may not find it easy to use Fastify's framework and plugins; avoid
 words that make it sound simple, easy, offensive, or insensitive. Not everyone
 who reads the documentation has the same level of understanding.
-
 
 ### Starting with a verb
 
@@ -156,17 +150,16 @@ and understand than the past or future tense.
 
 **Example**
 
- Less like this: There is a need for Node.js to be installed before you can be
- able to use Fastify.
+Less like this: There is a need for Node.js to be installed before you can be
+able to use Fastify.
 
- More like this: Install Node.js to make use of Fastify.
+More like this: Install Node.js to make use of Fastify.
 
 ### Grammatical moods
 
 Grammatical moods are a great way to express your writing. Avoid sounding too
 bossy while making a direct statement. Know when to switch between indicative,
 imperative, and subjunctive moods.
-
 
 **Indicative** - Use when making a factual statement or question.
 
@@ -178,8 +171,7 @@ write your headings.
 
 Example: Install dependencies before starting development.
 
-
-**Subjunctive** -  Use when making suggestions, hypotheses, or non-factual
+**Subjunctive** - Use when making suggestions, hypotheses, or non-factual
 statements.
 
 Example: Reading the documentation on our website is recommended to get
@@ -192,10 +184,9 @@ documentation.
 
 **Example**
 
-
 Passive: The node dependencies and packages are installed by npm.
 
-Active:  npm installs packages and node dependencies.
+Active: npm installs packages and node dependencies.
 
 ## Writing Style
 
@@ -209,11 +200,11 @@ Styles](https://medium.com/better-programming/string-case-styles-camel-pascal-sn
 
 **Examples**:
 
->`hook-and-plugins.md`,
+> `hook-and-plugins.md`,
 
- `adding-test-plugins.md`,
+`adding-test-plugins.md`,
 
- `removing-requests.md`.
+`removing-requests.md`.
 
 ### Hyperlinks
 

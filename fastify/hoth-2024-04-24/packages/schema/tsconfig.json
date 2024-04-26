@@ -4,5 +4,10 @@
         "rootDir": "src",
         "outDir": "dist"
     },
-    "exclude": ["./example/**/*.ts", "dist/*", "index.d.ts", "./__tests__/**/*.ts"]
+    "exclude": [
+        "./example/**/*.ts",
+        "dist/*",
+        "index.d.ts",
+        "./__tests__/**/*.ts"
+    ]
 }

@@ -4,7 +4,11 @@ import type {PluginOptions} from '../../types';
 
 export async function initThread(options: PluginOptions) {
     // 如果自定义了 env，需要设置 ROOT_PATH
-    if (options.env && (options.env !== process.env && options.env !== SHARE_ENV)) {
+    if (
+        options.env &&
+        options.env !== process.env &&
+        options.env !== SHARE_ENV
+    ) {
         if (typeof options.env !== 'object') {
             throw Error('options.env should be an object.');
         }

@@ -19,21 +19,18 @@ module.exports = {
             merge_logs: true,
             log_date_format: 'YYYY-MM-DD HH:mm:ss',
             env: {
-                'NODE_ENV': 'production',
-                'NODE_CONFIG_STRICT_MODE': '0'
+                NODE_ENV: 'production',
+                NODE_CONFIG_STRICT_MODE: '0',
             },
             env_development: {
-                'NODE_ENV': 'development',
-                'NODE_CONFIG_STRICT_MODE': '0'
+                NODE_ENV: 'development',
+                NODE_CONFIG_STRICT_MODE: '0',
             },
             env_production: {
-                'NODE_ENV': 'production',
-                'NODE_CONFIG_STRICT_MODE': '0'
+                NODE_ENV: 'production',
+                NODE_CONFIG_STRICT_MODE: '0',
             },
-            node_args: [
-                '--expose-gc',
-                '--preserve-symlinks'
-            ]
-        }
-    ]
+            node_args: ['--expose-gc', '--preserve-symlinks'],
+        },
+    ],
 };

@@ -26,7 +26,7 @@ There are a few basic ground-rules for contributors:
 1. **Non-main branches** ought to be used for ongoing work.
 1. **External API changes and significant modifications** ought to be subject to
    an **internal pull-request** to solicit feedback from other contributors.
-1. Internal pull-requests to solicit feedback are *encouraged* for any other
+1. Internal pull-requests to solicit feedback are _encouraged_ for any other
    non-trivial contribution but left to the discretion of the contributor.
 1. Contributors should attempt to adhere to the prevailing code-style.
 1. At least two contributors, or one core member, must approve pull-requests
@@ -44,11 +44,11 @@ changes should be based on the corresponding branch.
 We have a [Long Term Support](./docs/Reference/LTS.md) policy that defines
 the organization efforts for each Fastify's version.
 
-|Version|Branch|
-|-------|------|
-**v1.x**|[branch 1.x](https://github.com/fastify/fastify/tree/1.x)|
-**v2.x**|[branch 2.x](https://github.com/fastify/fastify/tree/2.x)|
-**v3.x**|[branch 3.x](https://github.com/fastify/fastify/tree/3.x)|
+| Version  | Branch                                                    |
+| -------- | --------------------------------------------------------- |
+| **v1.x** | [branch 1.x](https://github.com/fastify/fastify/tree/1.x) |
+| **v2.x** | [branch 2.x](https://github.com/fastify/fastify/tree/2.x) |
+| **v3.x** | [branch 3.x](https://github.com/fastify/fastify/tree/3.x) |
 
 ## Releases
 
@@ -65,8 +65,8 @@ Fastify repository with a few adjustments:
    specification.
 1. The Node.js compatibility must match with the Fastify's main branch.
 1. The new release must have the changelog information stored in the GitHub
-     release. For this scope we suggest to adopt a tool like
-     [`releasify`](https://github.com/fastify/releasify) to archive this.
+   release. For this scope we suggest to adopt a tool like
+   [`releasify`](https://github.com/fastify/releasify) to archive this.
 1. PR opened by bots (like Dependabot) can be merged if the CI is green and the
    Node.js versions supported are the same of the plugin.
 
@@ -84,19 +84,20 @@ The Fastify structure is detailed in the [GOVERNANCE](GOVERNANCE.md) document.
 
 Welcome to the team! We are happy to have you. Before you start, please complete
 the following tasks:
+
 1. Set up 2 factor authentication for GitHub and NPM
     - [GitHub
-    2FA](https://help.github.com/en/articles/securing-your-account-with-two-factor-authentication-2fa)
+      2FA](https://help.github.com/en/articles/securing-your-account-with-two-factor-authentication-2fa)
     - [NPM 2FA](https://docs.npmjs.com/about-two-factor-authentication)
-2. Choose which team to join *(more than one is ok!)* based on how you want to
+2. Choose which team to join _(more than one is ok!)_ based on how you want to
    help.
     - Core team: maintains the Fastify core and its documentation
     - Plugins team: maintains the Fastify's plugins and its ecosystem
 3. Open a pull request to
    [`fastify/fastify:HEAD`](https://github.com/fastify/fastify/pulls) that adds
    your name, username, and email to the team you have chosen in the
-   [README.md](./README.md) and [package.json](./package.json) *(if you are part
-   of the core team)* files. The members lists are sorted alphabetically; make
+   [README.md](./README.md) and [package.json](./package.json) _(if you are part
+   of the core team)_ files. The members lists are sorted alphabetically; make
    sure to add your name in the proper order.
 4. Open a pull request to
    [`fastify/website:HEAD`](https://github.com/fastify/website/pulls) adding
@@ -107,7 +108,7 @@ the following tasks:
 5. The person that does the onboarding must add you to the [npm
    org](https://www.npmjs.com/org/fastify), so that you can help maintaining the
    official plugins.
-6. Optionally, the person can be added as an Open Collective member 
+6. Optionally, the person can be added as an Open Collective member
    by the lead team.
 
 ### Offboarding Collaborators
@@ -115,18 +116,20 @@ the following tasks:
 We are thankful to you and we are really glad to have worked with you. We'll be
 really happy to see you here again if you want to come back, but for now the
 person that did the onboarding must:
+
 1. Ask the collaborator if they want to stay or not.
 1. If the collaborator can't work with us anymore, they should:
-  1. Open a pull request to
-     [`fastify/fastify:HEAD`](https://github.com/fastify/fastify/pulls) and move
-     themselves to the *Past Collaborators* section.
-  2. Open a pull request to
-     [`fastify/website:HEAD`](https://github.com/fastify/website/pulls) and move
-     themselves to the *Past Collaborators* section in the
-     [team.yml](https://github.com/fastify/website/blob/HEAD/static/data/team.yml)
-     file.
+1. Open a pull request to
+   [`fastify/fastify:HEAD`](https://github.com/fastify/fastify/pulls) and move
+   themselves to the _Past Collaborators_ section.
+1. Open a pull request to
+   [`fastify/website:HEAD`](https://github.com/fastify/website/pulls) and move
+   themselves to the _Past Collaborators_ section in the
+   [team.yml](https://github.com/fastify/website/blob/HEAD/static/data/team.yml)
+   file.
 
 The person that did the onboarding must:
+
 1. If the collaborator doesn't reply to the ping in reasonable time, open the
    pull requests described above.
 2. Remove the collaborator from the Fastify teams on GitHub.
@@ -134,28 +137,30 @@ The person that did the onboarding must:
    org](https://www.npmjs.com/org/fastify).
 4. Remove the collaborator from the Azure team.
 5. Remove the collaborator from the Open Collective members.
------------------------------------------
+
+---
 
 <a id="developers-certificate-of-origin"></a>
+
 ## Developer's Certificate of Origin 1.1
 
 By making a contribution to this project, I certify that:
 
-* (a) The contribution was created in whole or in part by me and I have the
-  right to submit it under the open source license indicated in the file; or
+-   (a) The contribution was created in whole or in part by me and I have the
+    right to submit it under the open source license indicated in the file; or
 
-* (b) The contribution is based upon previous work that, to the best of my
-  knowledge, is covered under an appropriate open source license and I have the
-  right under that license to submit that work with modifications, whether
-  created in whole or in part by me, under the same open source license (unless
-  I am permitted to submit under a different license), as indicated in the file;
-  or
+-   (b) The contribution is based upon previous work that, to the best of my
+    knowledge, is covered under an appropriate open source license and I have the
+    right under that license to submit that work with modifications, whether
+    created in whole or in part by me, under the same open source license (unless
+    I am permitted to submit under a different license), as indicated in the file;
+    or
 
-* (c) The contribution was provided directly to me by some other person who
-  certified (a), (b) or (c) and I have not modified it.
+-   (c) The contribution was provided directly to me by some other person who
+    certified (a), (b) or (c) and I have not modified it.
 
-* (d) I understand and agree that this project and the contribution are public
-  and that a record of the contribution (including all personal information I
-  submit with it, including my sign-off) is maintained indefinitely and may be
-  redistributed consistent with this project or the open source license(s)
-  involved.
+-   (d) I understand and agree that this project and the contribution are public
+    and that a record of the contribution (including all personal information I
+    submit with it, including my sign-off) is maintained indefinitely and may be
+    redistributed consistent with this project or the open source license(s)
+    involved.

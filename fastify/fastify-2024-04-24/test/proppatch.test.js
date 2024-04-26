@@ -1,9 +1,9 @@
-'use strict'
+'use strict';
 
-const t = require('tap')
-const test = t.test
-const sget = require('simple-get').concat
-const fastify = require('..')()
+const t = require('tap');
+const test = t.test;
+const sget = require('simple-get').concat;
+const fastify = require('..')();
 
 const bodySample = `<?xml version="1.0" encoding="utf-8" ?>
         <D:propertyupdate xmlns:D="DAV:"
@@ -21,18 +21,16 @@ const bodySample = `<?xml version="1.0" encoding="utf-8" ?>
               <Z:Copyright-Owner/>
             </D:prop>
           </D:remove>
-        </D:propertyupdate>`
+        </D:propertyupdate>`;
 
-test('shorthand - proppatch', t => {
-  t.plan(1)
-  try {
-    fastify.route({
-      method: 'PROPPATCH',
-      url: '*',
-      handler: function (req, reply) {
-        reply
-          .code(207)
-          .send(`<?xml version="1.0" encoding="utf-8" ?>
+test('shorthand - proppatch', (t) => {
+    t.plan(1);
+    try {
+        fastify.route({
+            method: 'PROPPATCH',
+            url: '*',
+            handler: function (req, reply) {
+                reply.code(207).send(`<?xml version="1.0" encoding="utf-8" ?>
             <D:multistatus xmlns:D="DAV:"
               xmlns:Z="http://ns.example.com/standards/z39.50/">
               <D:response>
@@ -51,58 +49,68 @@ test('shorthand - proppatch', t => {
                 </D:propstat>
                 <D:responsedescription> Copyright Owner cannot be deleted or altered.</D:responsedescription>
               </D:response>
-            </D:multistatus>`
-          )
-      }
-    })
-    t.pass()
-  } catch (e) {
-    t.fail()
-  }
-})
+            </D:multistatus>`);
+            },
+        });
+        t.pass();
+    } catch (e) {
+        t.fail();
+    }
+});
 
-fastify.listen({ port: 0 }, err => {
-  t.error(err)
-  t.teardown(() => { fastify.close() })
+fastify.listen({port: 0}, (err) => {
+    t.error(err);
+    t.teardown(() => {
+        fastify.close();
+    });
 
-  // the body test uses a text/plain content type instead of application/xml because it requires
-  // a specific content type parser
-  test('request with body - proppatch', t => {
-    t.plan(3)
-    sget({
-      url: `http://localhost:${fastify.server.address().port}/test/a.txt`,
-      headers: { 'content-type': 'text/plain' },
-      body: bodySample,
-      method: 'PROPPATCH'
-    }, (err, response, body) => {
-      t.error(err)
-      t.equal(response.statusCode, 207)
-      t.equal(response.headers['content-length'], '' + body.length)
-    })
-  })
+    // the body test uses a text/plain content type instead of application/xml because it requires
+    // a specific content type parser
+    test('request with body - proppatch', (t) => {
+        t.plan(3);
+        sget(
+            {
+                url: `http://localhost:${fastify.server.address().port}/test/a.txt`,
+                headers: {'content-type': 'text/plain'},
+                body: bodySample,
+                method: 'PROPPATCH',
+            },
+            (err, response, body) => {
+                t.error(err);
+                t.equal(response.statusCode, 207);
+                t.equal(response.headers['content-length'], '' + body.length);
+            },
+        );
+    });
 
-  test('request with body and no content type (415 error) - proppatch', t => {
-    t.plan(3)
-    sget({
-      url: `http://localhost:${fastify.server.address().port}/test/a.txt`,
-      body: bodySample,
-      method: 'PROPPATCH'
-    }, (err, response, body) => {
-      t.error(err)
-      t.equal(response.statusCode, 415)
-      t.equal(response.headers['content-length'], '' + body.length)
-    })
-  })
+    test('request with body and no content type (415 error) - proppatch', (t) => {
+        t.plan(3);
+        sget(
+            {
+                url: `http://localhost:${fastify.server.address().port}/test/a.txt`,
+                body: bodySample,
+                method: 'PROPPATCH',
+            },
+            (err, response, body) => {
+                t.error(err);
+                t.equal(response.statusCode, 415);
+                t.equal(response.headers['content-length'], '' + body.length);
+            },
+        );
+    });
 
-  test('request without body - proppatch', t => {
-    t.plan(3)
-    sget({
-      url: `http://localhost:${fastify.server.address().port}/test/a.txt`,
-      method: 'PROPPATCH'
-    }, (err, response, body) => {
-      t.error(err)
-      t.equal(response.statusCode, 207)
-      t.equal(response.headers['content-length'], '' + body.length)
-    })
-  })
-})
+    test('request without body - proppatch', (t) => {
+        t.plan(3);
+        sget(
+            {
+                url: `http://localhost:${fastify.server.address().port}/test/a.txt`,
+                method: 'PROPPATCH',
+            },
+            (err, response, body) => {
+                t.error(err);
+                t.equal(response.statusCode, 207);
+                t.equal(response.headers['content-length'], '' + body.length);
+            },
+        );
+    });
+});

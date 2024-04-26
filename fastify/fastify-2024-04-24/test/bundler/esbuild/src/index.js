@@ -1,9 +1,9 @@
-'use strict'
+'use strict';
 
-const fastify = require('../../../../')()
+const fastify = require('../../../../')();
 // Declare a route
 fastify.get('/', function (request, reply) {
-  reply.send({ hello: 'world' })
-})
+    reply.send({hello: 'world'});
+});
 
-module.exports = fastify
+module.exports = fastify;

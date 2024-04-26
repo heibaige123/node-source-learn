@@ -1,4 +1,4 @@
-# __appName__-node-ui
+# **appName**-node-ui
 
 ## development
 

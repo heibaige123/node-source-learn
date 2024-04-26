@@ -1,14 +1,15 @@
 <h1 align="center">Fastify</h1>
 
 ## Lifecycle
+
 <a id="lifecycle"></a>
 
 Following the schema of the internal lifecycle of Fastify.
 
 On the right branch of every section there is the next phase of the lifecycle,
 on the left branch there is the corresponding error code that will be generated
-if the parent throws an error *(note that all the errors are automatically
-handled by Fastify)*.
+if the parent throws an error _(note that all the errors are automatically
+handled by Fastify)_.
 
 ```
 Incoming Request
@@ -44,21 +45,23 @@ Incoming Request
 
 At any point before or during the `User Handler`, `reply.hijack()` can be called
 to prevent Fastify from:
-- Running all the following hooks and user handler
-- Sending the response automatically
 
-NB (*): If `reply.raw` is used to send a response back to the user, `onResponse`
+-   Running all the following hooks and user handler
+-   Sending the response automatically
+
+NB (\*): If `reply.raw` is used to send a response back to the user, `onResponse`
 hooks will still be executed
 
 ## Reply Lifecycle
+
 <a id="reply-lifecycle"></a>
 
 Whenever the user handles the request, the result may be:
 
-- in async handler: it returns a payload
-- in async handler: it throws an `Error`
-- in sync handler: it sends a payload
-- in sync handler: it sends an `Error` instance
+-   in async handler: it returns a payload
+-   in async handler: it throws an `Error`
+-   in sync handler: it sends a payload
+-   in sync handler: it sends an `Error` instance
 
 If the reply was hijacked, we skip all the below steps. Otherwise, when it is
 being submitted, the data flow performed is the following:
@@ -83,7 +86,7 @@ being submitted, the data flow performed is the following:
 
 Note: `reply sent` means that the JSON payload will be serialized by:
 
-- the [reply serialized](./Server.md#setreplyserializer) if set
-- or by the [serializer compiler](./Server.md#setserializercompiler) when a JSON
-  schema has been set for the returning HTTP status code
-- or by the default `JSON.stringify` function
+-   the [reply serialized](./Server.md#setreplyserializer) if set
+-   or by the [serializer compiler](./Server.md#setserializercompiler) when a JSON
+    schema has been set for the returning HTTP status code
+-   or by the default `JSON.stringify` function

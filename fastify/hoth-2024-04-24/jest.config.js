@@ -18,15 +18,15 @@ module.exports = {
     globals: {
         'ts-jest': {
             tsconfig: {
-                strict: false
-            }
-        }
+                strict: false,
+            },
+        },
     },
     setupFiles: ['jest-date-mock'],
     moduleNameMapper: {
         '@hoth/app-autoload': '<rootDir>/packages/app-autoload/src/index.ts',
         '@hoth/utils': '<rootDir>/packages/utils/src/index.ts',
         '@hoth/logger': '<rootDir>/packages/logger/src/index.ts',
-        '@hoth/decorators': '<rootDir>/packages/decorators/src/index.ts'
-    }
+        '@hoth/decorators': '<rootDir>/packages/decorators/src/index.ts',
+    },
 };

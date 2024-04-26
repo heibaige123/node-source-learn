@@ -1,5 +1,5 @@
-const { exec } = require('child_process');
-const { getSecondDir } = require('./utils');
+const {exec} = require('child_process');
+const {getSecondDir} = require('./utils');
 const fs = require('fs').promises;
 
 getSecondDir().then((dirs) => {
@@ -7,7 +7,7 @@ getSecondDir().then((dirs) => {
         dirs.forEach(async (dir) => {
             console.log(`${dir} 删除依赖啦`);
             exec(`cd ${dir}`);
-            await fs.rm('node_modules', { recursive: true, force: true });
+            await fs.rm('node_modules', {recursive: true, force: true});
             console.log(`${dir} 删除依赖啦成功`);
             exec('cd ..');
         });

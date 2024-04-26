@@ -1,1 +1,1 @@
-import { FastifyListenOptions, FastifyLogFn } from '../../fastify'
+import {FastifyListenOptions, FastifyLogFn} from '../../fastify';

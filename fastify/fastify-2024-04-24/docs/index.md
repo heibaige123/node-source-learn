@@ -2,8 +2,8 @@
 
 The documentation for Fastify is split into two categories:
 
-- [Reference documentation](./Reference/Index.md)
-- [Guides](./Guides/Index.md)
+-   [Reference documentation](./Reference/Index.md)
+-   [Guides](./Guides/Index.md)
 
 The reference documentation utilizes a very formal style in an effort to document
 Fastify's API and implementation details thoroughly for the developer who needs
@@ -21,4 +21,4 @@ more information about.
 
 ## Additional Documentation
 
-- Fastify's [Long Term Support (LTS)](./Reference/LTS.md) policy
+-   Fastify's [Long Term Support (LTS)](./Reference/LTS.md) policy

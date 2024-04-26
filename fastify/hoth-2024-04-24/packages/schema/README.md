@@ -13,9 +13,11 @@ import {compileInterface} from '@hoth/schema';
 
 function compile() {
     return src('src/interfaces/**/*.ts')
-        .pipe(compileInterface({
-            fileName: 'schema.json'
-        }))
+        .pipe(
+            compileInterface({
+                fileName: 'schema.json',
+            }),
+        )
         .pipe(dest('dist/interfaces'));
 }
 ```
@@ -32,7 +34,7 @@ import {FastifyInstance} from 'fastify';
 import {initSchema} from '@hoth/schema';
 export default async function main(fastify: FastifyInstance, config) {
     await initSchema(fastify, {
-        schemaPath: path.resolve(__dirname, './interfaces/schema.json')
+        schemaPath: path.resolve(__dirname, './interfaces/schema.json'),
     });
     return fastify;
 }
@@ -48,17 +50,15 @@ import {FastifyReply, FastifyRequest} from 'fastify';
 
 @Controller('/index')
 export default class AppController {
-
     @GET({
         url: '',
         options: {
             schema: {
-                querystring: {$ref: 'hoth/aaa.ts#/definitions/bbb'}
-            }
-        }
+                querystring: {$ref: 'hoth/aaa.ts#/definitions/bbb'},
+            },
+        },
     })
     getApp(req: FastifyRequest, reply: FastifyReply) {
-
         return '';
     }
 }
@@ -75,12 +75,14 @@ import {compileInterfaceToSchema} from '@hoth/schema/dist/gulp';
 
 function compile() {
     return src('src/interfaces/**/*.ts')
-        .pipe(compileInterfaceToSchema({
-            fileName: 'schema.json',
-            getId(filePath) {
-                return ''; // 这里根据 filePath 生成一个新的 id 来返回。
-            }
-        }))
+        .pipe(
+            compileInterfaceToSchema({
+                fileName: 'schema.json',
+                getId(filePath) {
+                    return ''; // 这里根据 filePath 生成一个新的 id 来返回。
+                },
+            }),
+        )
         .pipe(dest('dist/interfaces'));
 }
 ```

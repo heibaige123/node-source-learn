@@ -23,47 +23,57 @@ interface MoleculeConfig {
     controllers: MoleculeController[];
 }
 
-
-export async function loadMoleculeApp(appConfig: AppConfig, instance: FastifyInstance) {
+export async function loadMoleculeApp(
+    appConfig: AppConfig,
+    instance: FastifyInstance,
+) {
     const moleculeConfPath = join(appConfig.dir, 'config/molecule.json');
-    const {controllers} =  await loadModule(moleculeConfPath) as MoleculeConfig;
+    const {controllers} = (await loadModule(
+        moleculeConfPath,
+    )) as MoleculeConfig;
 
-    controllers.forEach(item => {
+    controllers.forEach((item) => {
         let httpType = item.httpType;
         let ctrlName = item.name;
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        instance[httpType](`/${ctrlName}`, async (request: FastifyRequest, reply) => {
-            let data = {} as any;
+        instance[httpType](
+            `/${ctrlName}`,
+            async (request: FastifyRequest, reply) => {
+                let data = {} as any;
 
-            if (httpType === 'post') {
-                data = request.body || request.query || {};
-            }
-            else if (httpType === 'get') {
-                data = request.query;
-            }
-            // 本地 mock 数据
-            if (process.env.DATA_MOCK) {
-                data = await loadModule(join(appConfig.dir, `mock/${ctrlName}.json`));
-            }
+                if (httpType === 'post') {
+                    data = request.body || request.query || {};
+                } else if (httpType === 'get') {
+                    data = request.query;
+                }
+                // 本地 mock 数据
+                if (process.env.DATA_MOCK) {
+                    data = await loadModule(
+                        join(appConfig.dir, `mock/${ctrlName}.json`),
+                    );
+                }
 
-            // @ts-ignore
-            let ret = await instance.molecule(item.ctrlPath, data, {
-                root: appConfig.dir,
-                appName: appConfig.name,
-                name: ctrlName,
-                logger: instance.log,
-            });
-            if (item.json) {
-                return ret ? {
-                    statusCode: 200,
-                    data: ret,
-                } : {
-                    statusCode: 500,
-                    message: 'render error',
-                };
-            }
-            return ret;
-        });
+                // @ts-ignore
+                let ret = await instance.molecule(item.ctrlPath, data, {
+                    root: appConfig.dir,
+                    appName: appConfig.name,
+                    name: ctrlName,
+                    logger: instance.log,
+                });
+                if (item.json) {
+                    return ret
+                        ? {
+                              statusCode: 200,
+                              data: ret,
+                          }
+                        : {
+                              statusCode: 500,
+                              message: 'render error',
+                          };
+                }
+                return ret;
+            },
+        );
     });
 }

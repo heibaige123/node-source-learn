@@ -49,5 +49,5 @@ async function getSecondDir() {
 
 module.exports = {
     getTopDir,
-    getSecondDir
+    getSecondDir,
 };

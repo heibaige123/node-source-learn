@@ -2,9 +2,9 @@
 # SEE https://www.gitpod.io/docs/references/gitpod-yml
 
 tasks:
-  - init: npm install
-    name: Install Dependencies
+    - init: npm install
+      name: Install Dependencies
 
 vscode:
-  extensions:
-    - "dbaeumer.vscode-eslint"
+    extensions:
+        - 'dbaeumer.vscode-eslint'

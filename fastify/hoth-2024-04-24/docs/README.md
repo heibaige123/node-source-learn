@@ -1,4 +1,5 @@
 # hoth
+
 A Node.js framework based on [Fastify](https://github.com/fastify/fastify).
 
 [![npm version](https://img.shields.io/npm/v/@hoth/cli.svg)](https://www.npmjs.com/package/@hoth/cli)
@@ -12,6 +13,7 @@ A Node.js framework based on [Fastify](https://github.com/fastify/fastify).
 Node.js v12+
 
 ## 安装
+
 hoth 提供了一个命令行工具，为开发 san ssr、vue ssr 等应用快速搭建脚手架。
 
 ```sh
@@ -28,10 +30,10 @@ hoth generate myproject
 
 脚手架需要选择项目类型，目前支持 4 种项目类型：
 
-- Normal：适合常规的 nodejs 服务端项目，没有前端编译，适合有服务端逻辑，且前端编译需要自定义的项目 [示例](https://github.com/searchfe/hoth/tree/main/example/hoth-quickstart)
-- Molecue：适合只有简单渲染逻辑的服务端项目，无服务端逻辑，且需要自己定义前端相关编译的项目 [示例](https://github.com/searchfe/hoth/tree/main/example/hoth-molecule)
-- Vue SSR App：开箱即用，使用 vue 3.0 + vue-cli，包含服务端渲染、vue 文件的编译配置
-- San SSR App：开箱即用，使用 san + san-cli + san-ssr，包含服务端渲染、san 文件的编译配置
+-   Normal：适合常规的 nodejs 服务端项目，没有前端编译，适合有服务端逻辑，且前端编译需要自定义的项目 [示例](https://github.com/searchfe/hoth/tree/main/example/hoth-quickstart)
+-   Molecue：适合只有简单渲染逻辑的服务端项目，无服务端逻辑，且需要自己定义前端相关编译的项目 [示例](https://github.com/searchfe/hoth/tree/main/example/hoth-molecule)
+-   Vue SSR App：开箱即用，使用 vue 3.0 + vue-cli，包含服务端渲染、vue 文件的编译配置
+-   San SSR App：开箱即用，使用 san + san-cli + san-ssr，包含服务端渲染、san 文件的编译配置
 
 创建完成以后进入项目目录下安装依赖：
 

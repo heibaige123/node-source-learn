@@ -26,17 +26,17 @@ for expenses.
 
 Reimbursement is applicable for expenses already paid, such as:
 
-- Stickers
-- Gadgets
-- Hosting
+-   Stickers
+-   Gadgets
+-   Hosting
 
 **Before making any purchases**, initiate a [new discussion](https://github.com/orgs/fastify/discussions)
 in the `fastify` organization with the following information:
 
-- What is needed
-- Why it is needed
-- Cost
-- Deadline
+-   What is needed
+-   Why it is needed
+-   Cost
+-   Deadline
 
 Once the discussion is approved by a lead maintainer and with no unresolved objections,
 the purchase can proceed, and an expense can be submitted to the [Open Collective][submit].
@@ -67,9 +67,9 @@ with the amount determined by the core team based on `estimated hours * rate`
 
 To add a bounty:
 
-- Apply the `bounty` label to the issue
-- Comment on the issue with the bounty amount
-- Edit the first comment of the issue using this template:
+-   Apply the `bounty` label to the issue
+-   Comment on the issue with the bounty amount
+-   Edit the first comment of the issue using this template:
 
 ```
 ## 💰 Bounty
@@ -89,14 +89,14 @@ if the contribution is outstanding.
 
 To claim a bounty:
 
-- Submit a PR that fixes the issue
-- If multiple submissions exist, a core member will choose the best solution
-- Once merged, the PR author can claim the bounty by:
-  - Submitting an expense to the [Open Collective][submit] with the PR link
-  - Adding a comment on the PR with a link to their Open Collective expense to
-    ensure the claimant is the issue resolver
-- The expense will be validated by a lead maintainer and then the payment will be
-  processed by Open Collective
+-   Submit a PR that fixes the issue
+-   If multiple submissions exist, a core member will choose the best solution
+-   Once merged, the PR author can claim the bounty by:
+    -   Submitting an expense to the [Open Collective][submit] with the PR link
+    -   Adding a comment on the PR with a link to their Open Collective expense to
+        ensure the claimant is the issue resolver
+-   The expense will be validated by a lead maintainer and then the payment will be
+    processed by Open Collective
 
 If the Open Collective budget is insufficient, the expense will be rejected.  
 Unclaimed bounties are available for other issues.

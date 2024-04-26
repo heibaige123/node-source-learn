@@ -8,18 +8,14 @@
             "name": "Launch Program",
             "program": "${file}",
             "request": "launch",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "skipFiles": ["<node_internals>/**"],
             "type": "pwa-node"
         },
         {
             "name": "Jest task",
             "program": "${workspaceFolder}/node_modules/.bin/jest",
             "request": "launch",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "skipFiles": ["<node_internals>/**"],
             "type": "pwa-node",
             "cwd": "${workspaceFolder}",
             "args": [
@@ -32,13 +28,9 @@
             "type": "pwa-node",
             "request": "launch",
             "name": "Launch Hoth Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "skipFiles": ["<node_internals>/**"],
             "program": "${workspaceFolder}/packages/cli/src/index.ts",
-            "outFiles": [
-                "${workspaceFolder}/packages/cli/dist/**/*.js"
-            ],
+            "outFiles": ["${workspaceFolder}/packages/cli/dist/**/*.js"],
             "env": {
                 "NODE_ENV": "development"
             },

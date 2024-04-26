@@ -33,8 +33,17 @@ export default function (args: string[]): Args {
         },
         number: ['port', 'debug-port', 'plugin-timeout'],
         boolean: ['debug', 'help', 'sub-app'],
-        string: ['address', 'socket', 'debug-host', 'app-dir', 'app-prefix', 'app-name', 'healthcheck-path',
-            'app-type', 'repo'],
+        string: [
+            'address',
+            'socket',
+            'debug-host',
+            'app-dir',
+            'app-prefix',
+            'app-name',
+            'healthcheck-path',
+            'app-type',
+            'repo',
+        ],
         envPrefix: 'HOTH_',
         alias: {
             port: ['p'],
@@ -51,7 +60,7 @@ export default function (args: string[]): Args {
             appDir: 'app',
             subApp: false,
             appPrefix: '/',
-            repo: ''
+            repo: '',
         },
     });
 

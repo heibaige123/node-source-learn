@@ -28,8 +28,6 @@ declare module 'fastify' {
     }
 }
 
-
-
 interface LoggerOptions {
     apps: Array<{name: string}>;
     rootPath: string;
@@ -42,12 +40,8 @@ interface StreamItem {
     stream: Stream;
 }
 
-
 export default function createLogger(options: LoggerOptions) {
-    let {
-        apps,
-        rootPath,
-    } = options;
+    let {apps, rootPath} = options;
 
     let streams: StreamItem[] = [];
 
@@ -56,11 +50,7 @@ export default function createLogger(options: LoggerOptions) {
     for (const {name} of apps) {
         const logPath = path.join(rootPath, 'log', name);
         fs.mkdirSync(logPath, {recursive: true});
-        const files = [
-            `${name}.log.ti`,
-            `${name}.log`,
-            `${name}.log.wf`,
-        ];
+        const files = [`${name}.log.ti`, `${name}.log`, `${name}.log.wf`];
         const levels = ['trace', 'notice', 'warn'];
         for (let i = 0; i < files.length; i++) {
             const fullpath = path.join(logPath, files[i]);
@@ -73,44 +63,46 @@ export default function createLogger(options: LoggerOptions) {
                     frequency: '1h',
                     verbose: process.env.NODE_ENV === 'development',
                     date_format: 'YYYYMMDDHH',
-                })
+                }),
             });
         }
     }
 
-    const logger = pino({
-        level: process.env.NODE_ENV === 'development' ? 'trace' : 'info',
-        customLevels: {
-            notice: 35,
-        },
-        serializers: {
-            res(reply) {
-                return {
-                    statusCode: reply.statusCode,
-                };
+    const logger = pino(
+        {
+            level: process.env.NODE_ENV === 'development' ? 'trace' : 'info',
+            customLevels: {
+                notice: 35,
             },
-            req(request) {
-                return {
-                    method: request.method,
-                    url: request.url,
-                    parameters: request.parameters,
-                    headers: request.headers,
-                    ip: request.ip,
-                    module: request.module,
-                    product: request.product,
-                    logid: request.logid,
-                    fields: request[fieldSym],
-                    notices: request[noticeSym],
-                    performance: request[performanceSym],
-                };
+            serializers: {
+                res(reply) {
+                    return {
+                        statusCode: reply.statusCode,
+                    };
+                },
+                req(request) {
+                    return {
+                        method: request.method,
+                        url: request.url,
+                        parameters: request.parameters,
+                        headers: request.headers,
+                        ip: request.ip,
+                        module: request.module,
+                        product: request.product,
+                        logid: request.logid,
+                        fields: request[fieldSym],
+                        notices: request[noticeSym],
+                        performance: request[performanceSym],
+                    };
+                },
+                err: pino.stdSerializers.err,
             },
-            err: pino.stdSerializers.err,
         },
-    }, stream(streams));
+        stream(streams),
+    );
 
     return logger;
 }
-
 
 export function preHandler(req: FastifyRequest, reply: FastifyReply, done) {
     req[noticeSym] = {};
@@ -136,8 +128,11 @@ export function preHandler(req: FastifyRequest, reply: FastifyReply, done) {
 // eslint-disable-next-line max-len
 // message: NOTICE: 2021-08-09 13:28:35 [-:-] errno[-] status[200] logId[2e45e4f4-56e8-4496-abf2-9731c083f0ee] pid[14871] uri[/app/other] cluster[-] idc[-] product[quickstart] module[test] clientIp[127.0.0.1] ua[Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36] refer[-] cookie[-] parseTime[0.2] validationTime[0.6] tm[-] responseTime[1.2]
 
-export function parse(line: string): Record<string, string | number> | undefined {
-    let regexp = /^(\w+):\s(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2})\s\[([\w-\/\.]+):([\d-]+)\]\s+(.*)$/;
+export function parse(
+    line: string,
+): Record<string, string | number> | undefined {
+    let regexp =
+        /^(\w+):\s(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2})\s\[([\w-\/\.]+):([\d-]+)\]\s+(.*)$/;
     const match = regexp.exec(line);
     if (!match) {
         return;

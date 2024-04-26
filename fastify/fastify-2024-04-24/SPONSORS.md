@@ -13,7 +13,7 @@ _Be the first!_
 
 ## Tier 3
 
-- [Mercedes-Benz Group](https://github.com/mercedes-benz)
+-   [Mercedes-Benz Group](https://github.com/mercedes-benz)
 
 ## Tier 2
 

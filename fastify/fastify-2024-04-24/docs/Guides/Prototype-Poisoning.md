@@ -5,10 +5,11 @@
 > above permission link.
 
 ## History behind prototype poisoning
+
 <a id="pp"></a>
 
 Based on the article by Eran Hammer,the issue is created by a web security bug.
-It is also a perfect illustration of the efforts required to maintain 
+It is also a perfect illustration of the efforts required to maintain
 open-source software and the limitations of existing communication channels.
 
 But first, if we use a JavaScript framework to process incoming JSON data, take
@@ -16,10 +17,11 @@ a moment to read up on [Prototype Poisoning](https://medium.com/intrinsic/javasc
 in general, and the specific
 [technical details](https://github.com/hapijs/hapi/issues/3916) of this issue.
 This could be a critical issue so, we might need to verify your own code first.
-It focuses on specific framework however, any solution that uses `JSON.parse()` 
+It focuses on specific framework however, any solution that uses `JSON.parse()`
 to process external data is potentially at risk.
 
 ### BOOM
+
 <a id="pp-boom"></a>
 
 The engineering team at Lob (long time generous supporters of my work!) reported
@@ -38,11 +40,12 @@ by the validation logic and pass through undetected. This is the worst possible
 defect a validation library can have.
 
 ### Prototype in a nutshell
+
 <a id="pp-nutshell"></a>
 
 To understand this, we need to understand how JavaScript works a bit.
 Every object in JavaScript can have a prototype. It is a set of methods and
-properties it "inherits" from another object. I have put inherits in quotes 
+properties it "inherits" from another object. I have put inherits in quotes
 because JavaScript isn't really an object-oriented language. It is a prototype-
 based object-oriented language.
 
@@ -79,6 +82,7 @@ objects  —  handles this magic `__proto__` property name.
 > a;
 {b: 5, __proto__: { c: 6 }}
 ```
+
 Notice how `a` has a `__proto__` property. This is not a prototype reference. It
 is a simple object property key, just like `b`. As we've seen from the first
 example, we can't actually create this key through assignment as that invokes
@@ -112,6 +116,7 @@ an `id` ), and pass it to our validation library, it would sneak in undetected
 via `__proto__`.
 
 ### Oh joi!
+
 <a id="pp-oh-joi"></a>
 
 The first question is, of course, why does the validation module **joi** ignore
@@ -128,6 +133,7 @@ very complicated prototype structure (with many methods and literal properties).
 Any solution at the joi level would mean breaking some currently working code.
 
 ### The right thing
+
 <a id="pp-right-thing"></a>
 
 At this point, we were looking at a devastatingly bad security vulnerability.
@@ -161,8 +167,8 @@ will share with the world how to exploit this vulnerability while also making it
 more time consuming for systems to upgrade (breaking changes never get applied
 automatically by build tools).
 
-
 ### A detour
+
 <a id="pp-detour"></a>
 
 While the issue at hand was about incoming request payloads, we had to pause and
@@ -176,6 +182,7 @@ confirm that the most popular third-party query string parser  —
 [qs](https://www.npmjs.com/package/qs) —  was not vulnerable (it is not!).
 
 ### A development
+
 <a id="pp-a-development"></a>
 
 Throughout this triage, we just assumed that the offending input with its
@@ -201,6 +208,7 @@ or a similar method on the payload, the `__proto__` property would leak and
 become an actual prototype.
 
 ### Sigh of relief
+
 <a id="pp-sigh-of-relief"></a>
 
 We were now dealing with a much different level of awfulness. Manipulating the
@@ -218,6 +226,7 @@ internally generated. The framework is really the only piece that can protect
 developers against making such unexpected mistakes.
 
 ### Good news, bad news, no news?
+
 <a id="pp-good-news-no-news"></a>
 
 The good news was that this wasn't our fault. It wasn't a bug in hapi or joi. It
@@ -251,6 +260,7 @@ I'm personally fine with abusing it for the purpose of improving security but
 that's not my call. As of this writing, it is still being debated.
 
 ### The solution business
+
 <a id="pp-solution-business"></a>
 
 Mitigating the issue wasn't hard. Making it scale and safe was a bit more
@@ -274,8 +284,8 @@ cost.
 
 I came up with a stupidly simple solution: first parse the text using the
 existing tools. If this didn't fail, scan the original raw text for the
-offending string "__proto__". Only if we find it, perform an actual scan of the
-object. We can't block every reference to "__proto__" — sometimes it is
+offending string "**proto**". Only if we find it, perform an actual scan of the
+object. We can't block every reference to "**proto**" — sometimes it is
 perfectly valid value (like when writing about it here and sending this text
 over to Medium for publication).
 
@@ -304,6 +314,7 @@ pointing this out to brag, but to highlight how basic engineering practices can
 create (or avoid) security pitfalls.
 
 ### Putting it to the test
+
 <a id="pp-putting-to-test"></a>
 
 I sent the code to two people. First to [Nathan
@@ -330,6 +341,7 @@ the actual cost in CPU time was still in the fraction of milliseconds. Important
 to note and measure but not actually harmful.
 
 ### hapi ever-after
+
 <a id="pp-hapi-ever-after"></a>
 
 There are a bunch of things to be grateful for.
@@ -357,6 +369,7 @@ and security again. Not using [hapi](https://hapi.dev)? [Maybe you
 should](https://hueniverse.com/why-you-should-consider-hapi-6163689bd7c2).
 
 ### The after in happy ever-after
+
 <a id="pp-after-ever-after"></a>
 
 This is where I have to take advantage of this incident to reiterate the cost
@@ -379,5 +392,3 @@ This is exactly what motivates me to implement the new [commercial licensing
 plan](https://web.archive.org/web/20190201220503/https://hueniverse.com/on-hapi-licensing-a-preview-f982662ee898)
 coming in March. You can read more about it
 [here](https://web.archive.org/web/20190201220503/https://hueniverse.com/on-hapi-licensing-a-preview-f982662ee898).
-
-

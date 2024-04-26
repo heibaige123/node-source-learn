@@ -1,4 +1,4 @@
-const {workerWrapper} = require('../../index')
+const {workerWrapper} = require('../../index');
 
 module.exports = workerWrapper(async function (hoth, a) {
     await new Promise((resolve, reject) => {

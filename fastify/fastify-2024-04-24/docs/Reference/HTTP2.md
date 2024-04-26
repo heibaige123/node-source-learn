@@ -10,26 +10,30 @@ interface. PRs are welcome.
 
 ### Secure (HTTPS)
 
-HTTP2 is supported in all modern browsers __only over a secure connection__:
+HTTP2 is supported in all modern browsers **only over a secure connection**:
 
 ```js
-'use strict'
+'use strict';
 
-const fs = require('node:fs')
-const path = require('node:path')
+const fs = require('node:fs');
+const path = require('node:path');
 const fastify = require('fastify')({
-  http2: true,
-  https: {
-    key: fs.readFileSync(path.join(__dirname, '..', 'https', 'fastify.key')),
-    cert: fs.readFileSync(path.join(__dirname, '..', 'https', 'fastify.cert'))
-  }
-})
+    http2: true,
+    https: {
+        key: fs.readFileSync(
+            path.join(__dirname, '..', 'https', 'fastify.key'),
+        ),
+        cert: fs.readFileSync(
+            path.join(__dirname, '..', 'https', 'fastify.cert'),
+        ),
+    },
+});
 
 fastify.get('/', function (request, reply) {
-  reply.code(200).send({ hello: 'world' })
-})
+    reply.code(200).send({hello: 'world'});
+});
 
-fastify.listen({ port: 3000 })
+fastify.listen({port: 3000});
 ```
 
 [ALPN negotiation](https://datatracker.ietf.org/doc/html/rfc7301) allows
@@ -40,25 +44,29 @@ Node core `req` and `res` objects can be either
 box:
 
 ```js
-'use strict'
+'use strict';
 
-const fs = require('node:fs')
-const path = require('node:path')
+const fs = require('node:fs');
+const path = require('node:path');
 const fastify = require('fastify')({
-  http2: true,
-  https: {
-    allowHTTP1: true, // fallback support for HTTP1
-    key: fs.readFileSync(path.join(__dirname, '..', 'https', 'fastify.key')),
-    cert: fs.readFileSync(path.join(__dirname, '..', 'https', 'fastify.cert'))
-  }
-})
+    http2: true,
+    https: {
+        allowHTTP1: true, // fallback support for HTTP1
+        key: fs.readFileSync(
+            path.join(__dirname, '..', 'https', 'fastify.key'),
+        ),
+        cert: fs.readFileSync(
+            path.join(__dirname, '..', 'https', 'fastify.cert'),
+        ),
+    },
+});
 
 // this route can be accessed through both protocols
 fastify.get('/', function (request, reply) {
-  reply.code(200).send({ hello: 'world' })
-})
+    reply.code(200).send({hello: 'world'});
+});
 
-fastify.listen({ port: 3000 })
+fastify.listen({port: 3000});
 ```
 
 You can test your new server with:
@@ -73,17 +81,17 @@ If you are building microservices, you can connect to HTTP2 in plain text,
 however, this is not supported by browsers.
 
 ```js
-'use strict'
+'use strict';
 
 const fastify = require('fastify')({
-  http2: true
-})
+    http2: true,
+});
 
 fastify.get('/', function (request, reply) {
-  reply.code(200).send({ hello: 'world' })
-})
+    reply.code(200).send({hello: 'world'});
+});
 
-fastify.listen({ port: 3000 })
+fastify.listen({port: 3000});
 ```
 
 You can test your new server with:
@@ -91,4 +99,3 @@ You can test your new server with:
 ```
 $ npx h2url http://localhost:3000
 ```
-

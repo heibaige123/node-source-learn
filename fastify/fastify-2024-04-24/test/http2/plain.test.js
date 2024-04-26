@@ -1,53 +1,55 @@
-'use strict'
+'use strict';
 
-const t = require('tap')
-const test = t.test
-const Fastify = require('../..')
-const h2url = require('h2url')
-const msg = { hello: 'world' }
+const t = require('tap');
+const test = t.test;
+const Fastify = require('../..');
+const h2url = require('h2url');
+const msg = {hello: 'world'};
 
-let fastify
+let fastify;
 try {
-  fastify = Fastify({
-    http2: true
-  })
-  t.pass('http2 successfully loaded')
+    fastify = Fastify({
+        http2: true,
+    });
+    t.pass('http2 successfully loaded');
 } catch (e) {
-  t.fail('http2 loading failed', e)
+    t.fail('http2 loading failed', e);
 }
 
 fastify.get('/', function (req, reply) {
-  reply.code(200).send(msg)
-})
+    reply.code(200).send(msg);
+});
 
 fastify.get('/hostname', function (req, reply) {
-  reply.code(200).send(req.hostname)
-})
+    reply.code(200).send(req.hostname);
+});
 
-fastify.listen({ port: 0 }, err => {
-  t.error(err)
-  t.teardown(() => { fastify.close() })
+fastify.listen({port: 0}, (err) => {
+    t.error(err);
+    t.teardown(() => {
+        fastify.close();
+    });
 
-  test('http get request', async (t) => {
-    t.plan(3)
+    test('http get request', async (t) => {
+        t.plan(3);
 
-    const url = `http://localhost:${fastify.server.address().port}`
-    const res = await h2url.concat({ url })
+        const url = `http://localhost:${fastify.server.address().port}`;
+        const res = await h2url.concat({url});
 
-    t.equal(res.headers[':status'], 200)
-    t.equal(res.headers['content-length'], '' + JSON.stringify(msg).length)
+        t.equal(res.headers[':status'], 200);
+        t.equal(res.headers['content-length'], '' + JSON.stringify(msg).length);
 
-    t.same(JSON.parse(res.body), msg)
-  })
+        t.same(JSON.parse(res.body), msg);
+    });
 
-  test('http hostname', async (t) => {
-    t.plan(1)
+    test('http hostname', async (t) => {
+        t.plan(1);
 
-    const hostname = `localhost:${fastify.server.address().port}`
+        const hostname = `localhost:${fastify.server.address().port}`;
 
-    const url = `http://${hostname}/hostname`
-    const res = await h2url.concat({ url })
+        const url = `http://${hostname}/hostname`;
+        const res = await h2url.concat({url});
 
-    t.equal(res.body, hostname)
-  })
-})
+        t.equal(res.body, hostname);
+    });
+});

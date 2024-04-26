@@ -1,4 +1,3 @@
-
 import type {FastifyInstance, FastifyReply} from 'fastify';
 import type {Swig, SwigOptions} from 'swig';
 import '@hoth/decorators';
@@ -6,12 +5,11 @@ import {join, resolve} from 'path';
 import fp from 'fastify-plugin';
 import LRU from 'lru-cache';
 
-
 type PartialRecord<K extends keyof any, T> = {
     [P in K]?: T;
 };
 const supportedEngines = ['swig', 'nunjucks', 'ejs'] as const;
-type supportedEnginesType = typeof supportedEngines[number];;
+type supportedEnginesType = (typeof supportedEngines)[number];
 type EngineList = PartialRecord<supportedEnginesType, any>;
 
 interface NunjunksOptions {
@@ -42,7 +40,11 @@ export interface HothViewOptions {
 
 declare module 'fastify' {
     interface FastifyReply {
-        render(page: string, data?: Record<string, unknown>, cb?: (err: Error, html: string) => void): Promise<string>;
+        render(
+            page: string,
+            data?: Record<string, unknown>,
+            cb?: (err: Error, html: string) => void,
+        ): Promise<string>;
         // locals?: object;
     }
 }
@@ -68,8 +70,7 @@ async function plugin(fastify: FastifyInstance, opts: HothViewOptions) {
     let templatesDir = opts.templatesDir;
     if (!templatesDir && fastify.$appConfig) {
         templatesDir = join(fastify.$appConfig.get('dir'), 'view');
-    }
-    else if (!templatesDir) {
+    } else if (!templatesDir) {
         templatesDir = resolve('./view');
     }
 
@@ -114,7 +115,13 @@ async function plugin(fastify: FastifyInstance, opts: HothViewOptions) {
         if (swigOptions.tags) {
             Object.keys(swigOptions.tags).forEach(function (name) {
                 const t = swigOptions.tags![name];
-                swig.setTag(name, t.parse, t.compile, t.ends, t.blockLevel || false);
+                swig.setTag(
+                    name,
+                    t.parse,
+                    t.compile,
+                    t.ends,
+                    t.blockLevel || false,
+                );
             });
         }
 
@@ -124,40 +131,42 @@ async function plugin(fastify: FastifyInstance, opts: HothViewOptions) {
                 swig.setFilter(name, t);
             });
         }
-    }
-    else if (type === 'ejs') {
+    } else if (type === 'ejs') {
         engine.cache = renderCaches;
     }
 
     const renderer = renders[type];
 
-    fastify.decorateReply('render', function (
-        this: FastifyReply,
-        page: string,
-        data: Record<string, unknown>,
-        cb?: (err: Error, html: string) => void
-    ) {
-        if (cb && typeof cb === 'function') {
-            return renderer.apply(this, [page, data, cb]);
-        }
-        return new Promise((resolve, reject) => {
-            const done = (error: Error, html: string) => {
-                if (error) {
-                    if (!renderOnly) {
-                        this.send(error);
+    fastify.decorateReply(
+        'render',
+        function (
+            this: FastifyReply,
+            page: string,
+            data: Record<string, unknown>,
+            cb?: (err: Error, html: string) => void,
+        ) {
+            if (cb && typeof cb === 'function') {
+                return renderer.apply(this, [page, data, cb]);
+            }
+            return new Promise((resolve, reject) => {
+                const done = (error: Error, html: string) => {
+                    if (error) {
+                        if (!renderOnly) {
+                            this.send(error);
+                        }
+                        reject(error);
                     }
-                    reject(error);
-                }
 
-                if (!renderOnly) {
-                    this.header('Content-Type', 'text/html; charset=utf-8');
-                    this.send(html);
-                }
-                resolve(html);
-            };
-            renderer.apply(this, [page, data, done]);
-        });
-    });
+                    if (!renderOnly) {
+                        this.header('Content-Type', 'text/html; charset=utf-8');
+                        this.send(html);
+                    }
+                    resolve(html);
+                };
+                renderer.apply(this, [page, data, done]);
+            });
+        },
+    );
 
     function getPage(page: string) {
         if (viewExt) {
@@ -170,7 +179,7 @@ async function plugin(fastify: FastifyInstance, opts: HothViewOptions) {
         this: FastifyReply,
         page: string,
         data: Record<string, unknown>,
-        done: (err: Error, html: string) => void
+        done: (err: Error, html: string) => void,
     ) {
         if (!page) {
             this.send(new Error('Missing page'));
@@ -185,7 +194,7 @@ async function plugin(fastify: FastifyInstance, opts: HothViewOptions) {
         this: FastifyReply,
         page: string,
         data: Record<string, unknown>,
-        done: (err: Error, html: string) => void
+        done: (err: Error, html: string) => void,
     ) {
         if (!page) {
             this.send(new Error('Missing page'));
@@ -200,7 +209,7 @@ async function plugin(fastify: FastifyInstance, opts: HothViewOptions) {
         this: FastifyReply,
         page: string,
         data: Record<string, unknown>,
-        done: (err: Error, html: string) => void
+        done: (err: Error, html: string) => void,
     ) {
         if (!page) {
             this.send(new Error('Missing page'));

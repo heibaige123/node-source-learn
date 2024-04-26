@@ -5,7 +5,10 @@
  */
 import fs, {promises as fsPromises} from 'fs';
 
-export async function rm(path: string, options?: Parameters<typeof fsPromises.rm>[1]) {
+export async function rm(
+    path: string,
+    options?: Parameters<typeof fsPromises.rm>[1],
+) {
     // @ts-ignore
     if (fsPromises.rm) {
         return fsPromises.rm(path, options);
@@ -14,18 +17,21 @@ export async function rm(path: string, options?: Parameters<typeof fsPromises.rm
     // below Node.js v14.14
     // remove when we stop support Node.js v12
     return fsPromises.rmdir(path, {
-        recursive: options?.recursive
+        recursive: options?.recursive,
     });
 }
 
-export function rmSync(path: string, options?: Parameters<typeof fs.rmSync>[1]) {
+export function rmSync(
+    path: string,
+    options?: Parameters<typeof fs.rmSync>[1],
+) {
     // @ts-ignore
     if (fs.rmSync) {
         return fs.rmSync(path, options);
     }
 
     return fs.rmdirSync(path, {
-        recursive: options?.recursive
+        recursive: options?.recursive,
     });
 }
 

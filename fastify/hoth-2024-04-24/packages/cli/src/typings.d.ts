@@ -8,4 +8,3 @@ declare module 'commist';
 declare module 'help-me';
 declare module 'generify';
 declare module 'update-notifier';
-

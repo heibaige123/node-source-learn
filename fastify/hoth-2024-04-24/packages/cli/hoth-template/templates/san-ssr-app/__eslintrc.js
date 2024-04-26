@@ -9,9 +9,7 @@ module.exports = {
     overrides: [
         {
             files: ['**.js'],
-            extends: [
-                '@ecomfe/eslint-config',
-            ],
+            extends: ['@ecomfe/eslint-config'],
         },
         {
             files: ['src/**/*.ts'],
@@ -35,10 +33,7 @@ module.exports = {
         },
         {
             files: ['**.san'],
-            extends: [
-                '@ecomfe/eslint-config',
-                '@ecomfe/eslint-config/san',
-            ],
+            extends: ['@ecomfe/eslint-config', '@ecomfe/eslint-config/san'],
             parserOptions: {
                 project: path.resolve(__dirname, './tsconfig.csr.json'),
                 extraFileExtension: ['.san'],

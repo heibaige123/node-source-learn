@@ -15,34 +15,34 @@ error handler is executed if set. If there is no upper-level error handler,
 the default will be executed as it was previously:
 
 ```js
-import Fastify from 'fastify'
+import Fastify from 'fastify';
 
-const fastify = Fastify()
+const fastify = Fastify();
 
-fastify.register(async fastify => {
-  fastify.setErrorHandler(async err => {
-    console.log(err.message) // 'kaboom'
-    throw new Error('caught')
-  })
-  
-  fastify.get('/encapsulated', async () => {
-    throw new Error('kaboom')
-  })
-})
+fastify.register(async (fastify) => {
+    fastify.setErrorHandler(async (err) => {
+        console.log(err.message); // 'kaboom'
+        throw new Error('caught');
+    });
 
-fastify.setErrorHandler(async err => {
-  console.log(err.message) // 'caught' 
-  throw new Error('wrapped')
-})
+    fastify.get('/encapsulated', async () => {
+        throw new Error('kaboom');
+    });
+});
 
-const res = await fastify.inject('/encapsulated')
-console.log(res.json().message) // 'wrapped'
+fastify.setErrorHandler(async (err) => {
+    console.log(err.message); // 'caught'
+    throw new Error('wrapped');
+});
+
+const res = await fastify.inject('/encapsulated');
+console.log(res.json().message); // 'wrapped'
 ```
 
->The root error handler is Fastify’s generic error handler. 
->This error handler will use the headers and status code in the Error object, 
->if they exist. **The headers and status code will not be automatically set if
->a custom error handler is provided**. 
+> The root error handler is Fastify’s generic error handler.
+> This error handler will use the headers and status code in the Error object,
+> if they exist. **The headers and status code will not be automatically set if
+> a custom error handler is provided**.
 
 ### Removed `app.use()` ([#3506](https://github.com/fastify/fastify/pull/3506))
 
@@ -75,60 +75,69 @@ You can revert this behavior by setting `exposeHeadRoutes: false` in the server 
 
 To improve error reporting in route definitions, route registration is now synchronous.
 As a result, if you specify an `onRoute` hook in a plugin you should now either:
-* wrap your routes in a plugin (recommended)
 
-  For example, refactor this:
-  ```js
-  fastify.register((instance, opts, done) => {
-    instance.addHook('onRoute', (routeOptions) => {
-      const { path, method } = routeOptions;
-      console.log({ path, method });
-      done();
+-   wrap your routes in a plugin (recommended)
+
+    For example, refactor this:
+
+    ```js
+    fastify.register((instance, opts, done) => {
+        instance.addHook('onRoute', (routeOptions) => {
+            const {path, method} = routeOptions;
+            console.log({path, method});
+            done();
+        });
     });
-  });
 
-  fastify.get('/', (request, reply) => { reply.send('hello') });
-  ```
-
-  Into this:
-  ```js
-  fastify.register((instance, opts, done) => {
-    instance.addHook('onRoute', (routeOptions) => {
-      const { path, method } = routeOptions;
-      console.log({ path, method });
-      done();
+    fastify.get('/', (request, reply) => {
+        reply.send('hello');
     });
-  });
+    ```
 
-  fastify.register((instance, opts, done) => {
-    instance.get('/', (request, reply) => { reply.send('hello') });
-    done();
-  });
-  ```
+    Into this:
 
-* use `await register(...)`
-
-  For example, refactor this:
-  ```js
-  fastify.register((instance, opts, done) => {
-    instance.addHook('onRoute', (routeOptions) => {
-      const { path, method } = routeOptions;
-      console.log({ path, method });
+    ```js
+    fastify.register((instance, opts, done) => {
+        instance.addHook('onRoute', (routeOptions) => {
+            const {path, method} = routeOptions;
+            console.log({path, method});
+            done();
+        });
     });
-    done();
-  });
-  ```
 
-  Into this:
-  ```js
-  await fastify.register((instance, opts, done) => {
-    instance.addHook('onRoute', (routeOptions) => {
-      const { path, method } = routeOptions;
-      console.log({ path, method });
+    fastify.register((instance, opts, done) => {
+        instance.get('/', (request, reply) => {
+            reply.send('hello');
+        });
+        done();
     });
-    done();
-  });
-  ```
+    ```
+
+-   use `await register(...)`
+
+    For example, refactor this:
+
+    ```js
+    fastify.register((instance, opts, done) => {
+        instance.addHook('onRoute', (routeOptions) => {
+            const {path, method} = routeOptions;
+            console.log({path, method});
+        });
+        done();
+    });
+    ```
+
+    Into this:
+
+    ```js
+    await fastify.register((instance, opts, done) => {
+        instance.addHook('onRoute', (routeOptions) => {
+            const {path, method} = routeOptions;
+            console.log({path, method});
+        });
+        done();
+    });
+    ```
 
 ### Optional URL parameters
 
@@ -138,16 +147,18 @@ optional parameters explicitly.
 
 For example, if you have the same route for listing and showing a post,
 refactor this:
+
 ```js
 fastify.get('/posts/:id', (request, reply) => {
-  const { id } = request.params;
+    const {id} = request.params;
 });
 ```
 
 Into this:
+
 ```js
 fastify.get('/posts/:id?', (request, reply) => {
-  const { id } = request.params;
+    const {id} = request.params;
 });
 ```
 
@@ -160,17 +171,17 @@ The [variadic signature](https://en.wikipedia.org/wiki/Variadic_function) of the
 
 Prior to this release, the following invocations of this method were valid:
 
-  - `fastify.listen(8000)`
-  - `fastify.listen(8000, ‘127.0.0.1’)`
-  - `fastify.listen(8000, ‘127.0.0.1’, 511)`
-  - `fastify.listen(8000, (err) => { if (err) throw err })`
-  - `fastify.listen({ port: 8000 }, (err) => { if (err) throw err })`
+-   `fastify.listen(8000)`
+-   `fastify.listen(8000, ‘127.0.0.1’)`
+-   `fastify.listen(8000, ‘127.0.0.1’, 511)`
+-   `fastify.listen(8000, (err) => { if (err) throw err })`
+-   `fastify.listen({ port: 8000 }, (err) => { if (err) throw err })`
 
 With Fastify v4, only the following invocations are valid:
 
-  - `fastify.listen()`
-  - `fastify.listen({ port: 8000 })`
-  - `fastify.listen({ port: 8000 }, (err) => { if (err) throw err })`
+-   `fastify.listen()`
+-   `fastify.listen({ port: 8000 })`
+-   `fastify.listen({ port: 8000 }, (err) => { if (err) throw err })`
 
 ### Change of schema for multiple types
 
@@ -179,22 +190,25 @@ types other than "null"
 [are now prohibited](https://ajv.js.org/strict-mode.html#strict-types).
 
 You may encounter a console warning such as:
+
 ```sh
 strict mode: use allowUnionTypes to allow union type keyword at "#/properties/image" (strictTypes)
 ```
 
 As such, schemas like below will need to be changed from:
+
 ```js
 {
   type: 'object',
   properties: {
     api_key: { type: 'string' },
     image: { type: ['object', 'array'] }
-  } 
+  }
 }
 ```
 
 Into:
+
 ```js
 {
   type: 'object',
@@ -213,6 +227,5 @@ Into:
 ### Add `reply.trailers` methods ([#3794](https://github.com/fastify/fastify/pull/3794))
 
 Fastify now supports the [HTTP Trailer] response headers.
-
 
 [HTTP Trailer]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Trailer

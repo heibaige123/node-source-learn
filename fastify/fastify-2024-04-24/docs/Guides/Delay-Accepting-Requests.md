@@ -6,7 +6,7 @@
 
 Fastify provides several [hooks](../Reference/Hooks.md) useful for a variety of
 situations. One of them is the [`onReady`](../Reference/Hooks.md#onready) hook,
-which is useful for executing tasks *right before* the server starts accepting
+which is useful for executing tasks _right before_ the server starts accepting
 new requests. There isn't, though, a direct mechanism to handle scenarios in
 which you'd like the server to start accepting **specific** requests and denying
 all others, at least up to some point.
@@ -48,131 +48,127 @@ server (fewer resources allocated to a bound-to-fail task) and for the client
 That will be achieved by wrapping into a custom plugin two main features:
 
 1. the mechanism for authenticating with the provider
-[decorating](../Reference/Decorators.md) the `fastify` object with the
-authentication key (`magicKey` from here onward)
+   [decorating](../Reference/Decorators.md) the `fastify` object with the
+   authentication key (`magicKey` from here onward)
 1. the mechanism for denying requests that would, otherwise, fail
 
 ### Hands-on
 
 For this sample solution we'll be using the following:
 
-- `node.js v16.14.2`
-- `npm 8.5.0`
-- `fastify 4.0.0-rc.1`
-- `fastify-plugin 3.0.1`
-- `undici 5.0.0`
+-   `node.js v16.14.2`
+-   `npm 8.5.0`
+-   `fastify 4.0.0-rc.1`
+-   `fastify-plugin 3.0.1`
+-   `undici 5.0.0`
 
 Say we have the following base server set up at first:
 
 ```js
-const Fastify = require('fastify')
+const Fastify = require('fastify');
 
-const provider = require('./provider')
+const provider = require('./provider');
 
-const server = Fastify({ logger: true })
-const USUAL_WAIT_TIME_MS = 5000
+const server = Fastify({logger: true});
+const USUAL_WAIT_TIME_MS = 5000;
 
 server.get('/ping', function (request, reply) {
-  reply.send({ error: false, ready: request.server.magicKey !== null })
-})
+    reply.send({error: false, ready: request.server.magicKey !== null});
+});
 
 server.post('/webhook', function (request, reply) {
-  // It's good practice to validate webhook requests really come from
-  // whoever you expect. This is skipped in this sample for the sake
-  // of simplicity
+    // It's good practice to validate webhook requests really come from
+    // whoever you expect. This is skipped in this sample for the sake
+    // of simplicity
 
-  const { magicKey } = request.body
-  request.server.magicKey = magicKey
-  request.log.info('Ready for customer requests!')
+    const {magicKey} = request.body;
+    request.server.magicKey = magicKey;
+    request.log.info('Ready for customer requests!');
 
-  reply.send({ error: false })
-})
+    reply.send({error: false});
+});
 
 server.get('/v1*', async function (request, reply) {
-  try {
-    const data = await provider.fetchSensitiveData(request.server.magicKey)
-    return { customer: true, error: false }
-  } catch (error) {
-    request.log.error({
-      error,
-      message: 'Failed at fetching sensitive data from provider',
-    })
+    try {
+        const data = await provider.fetchSensitiveData(request.server.magicKey);
+        return {customer: true, error: false};
+    } catch (error) {
+        request.log.error({
+            error,
+            message: 'Failed at fetching sensitive data from provider',
+        });
 
-    reply.statusCode = 500
-    return { customer: null, error: true }
-  }
-})
+        reply.statusCode = 500;
+        return {customer: null, error: true};
+    }
+});
 
-server.decorate('magicKey', null)
+server.decorate('magicKey', null);
 
-server.listen({ port: '1234' }, () => {
-  provider.thirdPartyMagicKeyGenerator(USUAL_WAIT_TIME_MS)
-    .catch((error) => {
-      server.log.error({
-        error,
-        message: 'Got an error while trying to get the magic key!'
-      })
+server.listen({port: '1234'}, () => {
+    provider.thirdPartyMagicKeyGenerator(USUAL_WAIT_TIME_MS).catch((error) => {
+        server.log.error({
+            error,
+            message: 'Got an error while trying to get the magic key!',
+        });
 
-      // Since we won't be able to serve requests, might as well wrap
-      // things up
-      server.close(() => process.exit(1))
-    })
-})
+        // Since we won't be able to serve requests, might as well wrap
+        // things up
+        server.close(() => process.exit(1));
+    });
+});
 ```
 
 Our code is simply setting up a Fastify server with a few routes:
 
-- a `/ping` route that specifies whether the service is ready or not to serve
-requests by checking if the `magicKey` has been set up
-- a `/webhook` endpoint for our provider to reach back to us when they're ready
-to share the `magicKey`. The `magicKey` is, then, saved into the previously set
-decorator on the `fastify` object
-- a catchall `/v1*` route to simulate what would have been customer-initiated
-requests. These requests rely on us having a valid `magicKey`
+-   a `/ping` route that specifies whether the service is ready or not to serve
+    requests by checking if the `magicKey` has been set up
+-   a `/webhook` endpoint for our provider to reach back to us when they're ready
+    to share the `magicKey`. The `magicKey` is, then, saved into the previously set
+    decorator on the `fastify` object
+-   a catchall `/v1*` route to simulate what would have been customer-initiated
+    requests. These requests rely on us having a valid `magicKey`
 
 The `provider.js` file, simulating actions of an external provider, is as
 follows:
 
 ```js
-const { fetch } = require('undici')
-const { setTimeout } = require('node:timers/promises')
+const {fetch} = require('undici');
+const {setTimeout} = require('node:timers/promises');
 
-const MAGIC_KEY = '12345'
+const MAGIC_KEY = '12345';
 
-const delay = setTimeout
+const delay = setTimeout;
 
 exports.thirdPartyMagicKeyGenerator = async (ms) => {
-  // Simulate processing delay
-  await delay(ms)
+    // Simulate processing delay
+    await delay(ms);
 
-  // Simulate webhook request to our server
-  const { status } = await fetch(
-    'http://localhost:1234/webhook',
-    {
-      body: JSON.stringify({ magicKey: MAGIC_KEY }),
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-    },
-  )
+    // Simulate webhook request to our server
+    const {status} = await fetch('http://localhost:1234/webhook', {
+        body: JSON.stringify({magicKey: MAGIC_KEY}),
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json',
+        },
+    });
 
-  if (status !== 200) {
-    throw new Error('Failed to fetch magic key')
-  }
-}
+    if (status !== 200) {
+        throw new Error('Failed to fetch magic key');
+    }
+};
 
 exports.fetchSensitiveData = async (key) => {
-  // Simulate processing delay
-  await delay(700)
-  const data = { sensitive: true }
+    // Simulate processing delay
+    await delay(700);
+    const data = {sensitive: true};
 
-  if (key === MAGIC_KEY) {
-    return data
-  }
+    if (key === MAGIC_KEY) {
+        return data;
+    }
 
-  throw new Error('Invalid key')
-}
+    throw new Error('Invalid key');
+};
 ```
 
 The most important snippet here is the `thirdPartyMagicKeyGenerator` function,
@@ -199,8 +195,8 @@ What we'll do to improve this setup overall is create a
 [`Plugin`](../Reference/Plugins.md) that'll be solely responsible for making
 sure we both:
 
-- do not accept requests that would otherwise fail until we're ready for them
-- make sure we reach out to our provider as soon as possible
+-   do not accept requests that would otherwise fail until we're ready for them
+-   make sure we reach out to our provider as soon as possible
 
 This way we'll make sure all our setup regarding this specific _business rule_
 is placed on a single entity, instead of scattered all across our code base.
@@ -210,171 +206,171 @@ With the changes to improve this behavior, the code will look like this:
 ##### index.js
 
 ```js
-const Fastify = require('fastify')
+const Fastify = require('fastify');
 
-const customerRoutes = require('./customer-routes')
-const { setup, delay } = require('./delay-incoming-requests')
+const customerRoutes = require('./customer-routes');
+const {setup, delay} = require('./delay-incoming-requests');
 
-const server = new Fastify({ logger: true })
+const server = new Fastify({logger: true});
 
-server.register(setup)
+server.register(setup);
 
 // Non-blocked URL
 server.get('/ping', function (request, reply) {
-  reply.send({ error: false, ready: request.server.magicKey !== null })
-})
+    reply.send({error: false, ready: request.server.magicKey !== null});
+});
 
 // Webhook to handle the provider's response - also non-blocked
 server.post('/webhook', function (request, reply) {
-  // It's good practice to validate webhook requests really come from
-  // whoever you expect. This is skipped in this sample for the sake
-  // of simplicity
+    // It's good practice to validate webhook requests really come from
+    // whoever you expect. This is skipped in this sample for the sake
+    // of simplicity
 
-  const { magicKey } = request.body
-  request.server.magicKey = magicKey
-  request.log.info('Ready for customer requests!')
+    const {magicKey} = request.body;
+    request.server.magicKey = magicKey;
+    request.log.info('Ready for customer requests!');
 
-  reply.send({ error: false })
-})
+    reply.send({error: false});
+});
 
 // Blocked URLs
 // Mind we're building a new plugin by calling the `delay` factory with our
 // customerRoutes plugin
-server.register(delay(customerRoutes), { prefix: '/v1' })
+server.register(delay(customerRoutes), {prefix: '/v1'});
 
-server.listen({ port: '1234' })
+server.listen({port: '1234'});
 ```
 
 ##### provider.js
 
 ```js
-const { fetch } = require('undici')
-const { setTimeout } = require('node:timers/promises')
+const {fetch} = require('undici');
+const {setTimeout} = require('node:timers/promises');
 
-const MAGIC_KEY = '12345'
+const MAGIC_KEY = '12345';
 
-const delay = setTimeout
+const delay = setTimeout;
 
 exports.thirdPartyMagicKeyGenerator = async (ms) => {
-  // Simulate processing delay
-  await delay(ms)
+    // Simulate processing delay
+    await delay(ms);
 
-  // Simulate webhook request to our server
-  const { status } = await fetch(
-    'http://localhost:1234/webhook',
-    {
-      body: JSON.stringify({ magicKey: MAGIC_KEY }),
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-    },
-  )
+    // Simulate webhook request to our server
+    const {status} = await fetch('http://localhost:1234/webhook', {
+        body: JSON.stringify({magicKey: MAGIC_KEY}),
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json',
+        },
+    });
 
-  if (status !== 200) {
-    throw new Error('Failed to fetch magic key')
-  }
-}
+    if (status !== 200) {
+        throw new Error('Failed to fetch magic key');
+    }
+};
 
 exports.fetchSensitiveData = async (key) => {
-  // Simulate processing delay
-  await delay(700)
-  const data = { sensitive: true }
+    // Simulate processing delay
+    await delay(700);
+    const data = {sensitive: true};
 
-  if (key === MAGIC_KEY) {
-    return data
-  }
+    if (key === MAGIC_KEY) {
+        return data;
+    }
 
-  throw new Error('Invalid key')
-}
+    throw new Error('Invalid key');
+};
 ```
 
 ##### delay-incoming-requests.js
 
 ```js
-const fp = require('fastify-plugin')
+const fp = require('fastify-plugin');
 
-const provider = require('./provider')
+const provider = require('./provider');
 
-const USUAL_WAIT_TIME_MS = 5000
+const USUAL_WAIT_TIME_MS = 5000;
 
 async function setup(fastify) {
-  // As soon as we're listening for requests, let's work our magic
-  fastify.server.on('listening', doMagic)
+    // As soon as we're listening for requests, let's work our magic
+    fastify.server.on('listening', doMagic);
 
-  // Set up the placeholder for the magicKey
-  fastify.decorate('magicKey', null)
+    // Set up the placeholder for the magicKey
+    fastify.decorate('magicKey', null);
 
-  // Our magic -- important to make sure errors are handled. Beware of async
-  // functions outside `try/catch` blocks
-  // If an error is thrown at this point and not captured it'll crash the
-  // application
-  function doMagic() {
-    fastify.log.info('Doing magic!')
+    // Our magic -- important to make sure errors are handled. Beware of async
+    // functions outside `try/catch` blocks
+    // If an error is thrown at this point and not captured it'll crash the
+    // application
+    function doMagic() {
+        fastify.log.info('Doing magic!');
 
-    provider.thirdPartyMagicKeyGenerator(USUAL_WAIT_TIME_MS)
-      .catch((error) => {
-        fastify.log.error({
-          error,
-          message: 'Got an error while trying to get the magic key!'
-        })
+        provider
+            .thirdPartyMagicKeyGenerator(USUAL_WAIT_TIME_MS)
+            .catch((error) => {
+                fastify.log.error({
+                    error,
+                    message: 'Got an error while trying to get the magic key!',
+                });
 
-        // Since we won't be able to serve requests, might as well wrap
-        // things up
-        fastify.close(() => process.exit(1))
-      })
-  }
+                // Since we won't be able to serve requests, might as well wrap
+                // things up
+                fastify.close(() => process.exit(1));
+            });
+    }
 }
 
 const delay = (routes) =>
-  function (fastify, opts, done) {
-    // Make sure customer requests won't be accepted if the magicKey is not
-    // available
-    fastify.addHook('onRequest', function (request, reply, next) {
-      if (!request.server.magicKey) {
-        reply.statusCode = 503
-        reply.header('Retry-After', USUAL_WAIT_TIME_MS)
-        reply.send({ error: true, retryInMs: USUAL_WAIT_TIME_MS })
-      }
+    function (fastify, opts, done) {
+        // Make sure customer requests won't be accepted if the magicKey is not
+        // available
+        fastify.addHook('onRequest', function (request, reply, next) {
+            if (!request.server.magicKey) {
+                reply.statusCode = 503;
+                reply.header('Retry-After', USUAL_WAIT_TIME_MS);
+                reply.send({error: true, retryInMs: USUAL_WAIT_TIME_MS});
+            }
 
-      next()
-    })
+            next();
+        });
 
-    // Register to-be-delayed routes
-    fastify.register(routes, opts)
+        // Register to-be-delayed routes
+        fastify.register(routes, opts);
 
-    done()
-  }
+        done();
+    };
 
 module.exports = {
-  setup: fp(setup),
-  delay,
-}
+    setup: fp(setup),
+    delay,
+};
 ```
 
 ##### customer-routes.js
 
 ```js
-const fp = require('fastify-plugin')
+const fp = require('fastify-plugin');
 
-const provider = require('./provider')
+const provider = require('./provider');
 
 module.exports = fp(async function (fastify) {
-  fastify.get('*', async function (request ,reply) {
-    try {
-      const data = await provider.fetchSensitiveData(request.server.magicKey)
-      return { customer: true, error: false }
-    } catch (error) {
-      request.log.error({
-        error,
-        message: 'Failed at fetching sensitive data from provider',
-      })
+    fastify.get('*', async function (request, reply) {
+        try {
+            const data = await provider.fetchSensitiveData(
+                request.server.magicKey,
+            );
+            return {customer: true, error: false};
+        } catch (error) {
+            request.log.error({
+                error,
+                message: 'Failed at fetching sensitive data from provider',
+            });
 
-      reply.statusCode = 500
-      return { customer: null, error: true }
-    }
-  })
-})
+            reply.statusCode = 500;
+            return {customer: null, error: true};
+        }
+    });
+});
 ```
 
 There is a very specific change on the previously existing files that is worth
@@ -396,7 +392,7 @@ The `setup` plugin is responsible for making sure we reach out to our provider
 asap and store the `magicKey` somewhere available to all our handlers.
 
 ```js
-  fastify.server.on('listening', doMagic)
+fastify.server.on('listening', doMagic);
 ```
 
 As soon as the server starts listening (very similar behavior to adding a piece
@@ -406,7 +402,7 @@ https://nodejs.org/api/net.html#event-listening). We use that to reach out to
 our provider as soon as possible, with the `doMagic` function.
 
 ```js
-  fastify.decorate('magicKey', null)
+fastify.decorate('magicKey', null);
 ```
 
 The `magicKey` decoration is also part of the plugin now. We initialize it with
@@ -414,31 +410,31 @@ a placeholder, waiting for the valid value to be retrieved.
 
 ##### delay
 
-`delay` is not a plugin itself. It's actually a plugin *factory*. It expects a
+`delay` is not a plugin itself. It's actually a plugin _factory_. It expects a
 Fastify plugin with `routes` and exports the actual plugin that'll handle
 enveloping those routes with an `onRequest` hook that will make sure no requests
 are handled until we're ready for them.
 
 ```js
 const delay = (routes) =>
-  function (fastify, opts, done) {
-    // Make sure customer requests won't be accepted if the magicKey is not
-    // available
-    fastify.addHook('onRequest', function (request, reply, next) {
-      if (!request.server.magicKey) {
-        reply.statusCode = 503
-        reply.header('Retry-After', USUAL_WAIT_TIME_MS)
-        reply.send({ error: true, retryInMs: USUAL_WAIT_TIME_MS })
-      }
+    function (fastify, opts, done) {
+        // Make sure customer requests won't be accepted if the magicKey is not
+        // available
+        fastify.addHook('onRequest', function (request, reply, next) {
+            if (!request.server.magicKey) {
+                reply.statusCode = 503;
+                reply.header('Retry-After', USUAL_WAIT_TIME_MS);
+                reply.send({error: true, retryInMs: USUAL_WAIT_TIME_MS});
+            }
 
-      next()
-    })
+            next();
+        });
 
-    // Register to-be-delayed routes
-    fastify.register(routes, opts)
+        // Register to-be-delayed routes
+        fastify.register(routes, opts);
 
-    done()
-  }
+        done();
+    };
 ```
 
 Instead of updating every single controller that might use the `magicKey`, we
@@ -468,6 +464,7 @@ index.js` and made a few requests to test things out. These were the logs we'd
 see (some bloat was removed to ease things up):
 
 <!-- markdownlint-disable -->
+
 ```sh
 {"time":1650063793316,"msg":"Doing magic!"}
 {"time":1650063793316,"msg":"Server listening at http://127.0.0.1:1234"}
@@ -481,6 +478,7 @@ see (some bloat was removed to ease things up):
 {"time":1650063799858,"reqId":"req-4","req":{"method":"GET","url":"/v1","hostname":"localhost:1234","remoteAddress":"127.0.0.1","remotePort":51934},"msg":"incoming request"}
 {"time":1650063800561,"reqId":"req-4","res":{"statusCode":200},"responseTime":702.4662979990244,"msg":"request completed"}
 ```
+
 <!-- markdownlint-enable -->
 
 Let's focus on a few parts:
@@ -497,12 +495,14 @@ couldn't do that before the server was ready to receive connections).
 While the server is still not ready, a few requests are attempted:
 
 <!-- markdownlint-disable -->
+
 ```sh
 {"time":1650063795030,"reqId":"req-1","req":{"method":"GET","url":"/v1","hostname":"localhost:1234","remoteAddress":"127.0.0.1","remotePort":51928},"msg":"incoming request"}
 {"time":1650063795033,"reqId":"req-1","res":{"statusCode":503},"responseTime":2.5721680000424385,"msg":"request completed"}
 {"time":1650063796248,"reqId":"req-2","req":{"method":"GET","url":"/ping","hostname":"localhost:1234","remoteAddress":"127.0.0.1","remotePort":51930},"msg":"incoming request"}
 {"time":1650063796248,"reqId":"req-2","res":{"statusCode":200},"responseTime":0.4802369996905327,"msg":"request completed"}
 ```
+
 <!-- markdownlint-enable -->
 
 The first one (`req-1`) was a `GET /v1`, that failed (**FAST** - `responseTime`
@@ -528,8 +528,8 @@ Then we attempt a new request (`req-2`), which was a `GET /ping`. As expected,
 since that was not one of the requests we asked our plugin to filter, it
 succeeded. That could also be used as means of informing an interested party
 whether or not we were ready to serve requests (although `/ping` is more
-commonly associated with *liveness* checks and that would be the responsibility
-of a *readiness* check -- the curious reader can get more info on these terms
+commonly associated with _liveness_ checks and that would be the responsibility
+of a _readiness_ check -- the curious reader can get more info on these terms
 [here](https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-setting-up-health-checks-with-readiness-and-liveness-probes))
 with the `ready` field. Below is the response for that request:
 
@@ -550,11 +550,13 @@ Keep-Alive: timeout=5
 After that there were more interesting log messages:
 
 <!-- markdownlint-disable -->
+
 ```sh
 {"time":1650063798377,"reqId":"req-3","req":{"method":"POST","url":"/webhook","hostname":"localhost:1234","remoteAddress":"127.0.0.1","remotePort":51932},"msg":"incoming request"}
 {"time":1650063798379,"reqId":"req-3","msg":"Ready for customer requests!"}
 {"time":1650063798379,"reqId":"req-3","res":{"statusCode":200},"responseTime":1.3567829988896847,"msg":"request completed"}
 ```
+
 <!-- markdownlint-enable -->
 
 This time it was our simulated external provider hitting us to let us know
@@ -563,10 +565,12 @@ that into our `magicKey` decorator and celebrated with a log message saying we
 were now ready for customers to hit us!
 
 <!-- markdownlint-disable -->
+
 ```sh
 {"time":1650063799858,"reqId":"req-4","req":{"method":"GET","url":"/v1","hostname":"localhost:1234","remoteAddress":"127.0.0.1","remotePort":51934},"msg":"incoming request"}
 {"time":1650063800561,"reqId":"req-4","res":{"statusCode":200},"responseTime":702.4662979990244,"msg":"request completed"}
 ```
+
 <!-- markdownlint-enable -->
 
 Finally, a final `GET /v1` request was made and, this time, it succeeded. Its

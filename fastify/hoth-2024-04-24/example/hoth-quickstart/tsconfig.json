@@ -6,10 +6,6 @@
         "declaration": false,
         "composite": false
     },
-    "references": [
-      { "path": "../../packages/decorators" }
-    ],
-    "exclude": [
-      "./gulpfile.ts"
-    ]
-  }
+    "references": [{"path": "../../packages/decorators"}],
+    "exclude": ["./gulpfile.ts"]
+}

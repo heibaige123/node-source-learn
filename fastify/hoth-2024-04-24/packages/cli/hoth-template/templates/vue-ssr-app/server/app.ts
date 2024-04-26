@@ -6,7 +6,10 @@ import staticPlugin from 'fastify-static';
 import type {FastifyInstance} from 'fastify';
 import type {AppConfig} from '@hoth/app-autoload';
 
-export default async function main(fastify: FastifyInstance, config: Pick<AppConfig, 'dir'>) {
+export default async function main(
+    fastify: FastifyInstance,
+    config: Pick<AppConfig, 'dir'>,
+) {
     await fastify.register(view, {
         engine: {
             swig,

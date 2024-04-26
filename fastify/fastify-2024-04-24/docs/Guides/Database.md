@@ -2,208 +2,216 @@
 
 ## Database
 
-Fastify's ecosystem provides a handful of 
-plugins for connecting to various database engines. 
-This guide covers engines that have Fastify 
+Fastify's ecosystem provides a handful of
+plugins for connecting to various database engines.
+This guide covers engines that have Fastify
 plugins maintained within the Fastify organization.
 
-> If a plugin for your database of choice does not exist 
-> you can still use the database as Fastify is database agnostic. 
-> By following the examples of the database plugins listed in this guide, 
-> a plugin can be written for the missing database engine. 
+> If a plugin for your database of choice does not exist
+> you can still use the database as Fastify is database agnostic.
+> By following the examples of the database plugins listed in this guide,
+> a plugin can be written for the missing database engine.
 
-> If you would like to write your own Fastify plugin 
+> If you would like to write your own Fastify plugin
 > please take a look at the [plugins guide](./Plugins-Guide.md)
 
 ### [MySQL](https://github.com/fastify/fastify-mysql)
 
 Install the plugin by running `npm i @fastify/mysql`.
 
-*Usage:*
+_Usage:_
 
 ```javascript
-const fastify = require('fastify')()
+const fastify = require('fastify')();
 
 fastify.register(require('@fastify/mysql'), {
-  connectionString: 'mysql://root@localhost/mysql'
-})
+    connectionString: 'mysql://root@localhost/mysql',
+});
 
-fastify.get('/user/:id', function(req, reply) {
-  fastify.mysql.query(
-    'SELECT id, username, hash, salt FROM users WHERE id=?', [req.params.id],
-    function onResult (err, result) {
-      reply.send(err || result)
-    }
-  )
-})
+fastify.get('/user/:id', function (req, reply) {
+    fastify.mysql.query(
+        'SELECT id, username, hash, salt FROM users WHERE id=?',
+        [req.params.id],
+        function onResult(err, result) {
+            reply.send(err || result);
+        },
+    );
+});
 
-fastify.listen({ port: 3000 }, err => {
-  if (err) throw err
-  console.log(`server listening on ${fastify.server.address().port}`)
-})
+fastify.listen({port: 3000}, (err) => {
+    if (err) throw err;
+    console.log(`server listening on ${fastify.server.address().port}`);
+});
 ```
 
 ### [Postgres](https://github.com/fastify/fastify-postgres)
+
 Install the plugin by running `npm i pg @fastify/postgres`.
 
-*Example*:
+_Example_:
 
 ```javascript
-const fastify = require('fastify')()
+const fastify = require('fastify')();
 
 fastify.register(require('@fastify/postgres'), {
-  connectionString: 'postgres://postgres@localhost/postgres'
-})
+    connectionString: 'postgres://postgres@localhost/postgres',
+});
 
 fastify.get('/user/:id', function (req, reply) {
-  fastify.pg.query(
-    'SELECT id, username, hash, salt FROM users WHERE id=$1', [req.params.id],
-    function onResult (err, result) {
-      reply.send(err || result)
-    }
-  )
-})
+    fastify.pg.query(
+        'SELECT id, username, hash, salt FROM users WHERE id=$1',
+        [req.params.id],
+        function onResult(err, result) {
+            reply.send(err || result);
+        },
+    );
+});
 
-fastify.listen({ port: 3000 }, err => {
-  if (err) throw err
-  console.log(`server listening on ${fastify.server.address().port}`)
-})
+fastify.listen({port: 3000}, (err) => {
+    if (err) throw err;
+    console.log(`server listening on ${fastify.server.address().port}`);
+});
 ```
 
 ### [Redis](https://github.com/fastify/fastify-redis)
+
 Install the plugin by running `npm i @fastify/redis`
 
-*Usage:*
+_Usage:_
 
 ```javascript
-'use strict'
+'use strict';
 
-const fastify = require('fastify')()
+const fastify = require('fastify')();
 
-fastify.register(require('@fastify/redis'), { host: '127.0.0.1' })
+fastify.register(require('@fastify/redis'), {host: '127.0.0.1'});
 // or
-fastify.register(require('@fastify/redis'), { url: 'redis://127.0.0.1', /* other redis options */ })
+fastify.register(require('@fastify/redis'), {
+    url: 'redis://127.0.0.1' /* other redis options */,
+});
 
 fastify.get('/foo', function (req, reply) {
-  const { redis } = fastify
-  redis.get(req.query.key, (err, val) => {
-    reply.send(err || val)
-  })
-})
+    const {redis} = fastify;
+    redis.get(req.query.key, (err, val) => {
+        reply.send(err || val);
+    });
+});
 
 fastify.post('/foo', function (req, reply) {
-  const { redis } = fastify
-  redis.set(req.body.key, req.body.value, (err) => {
-    reply.send(err || { status: 'ok' })
-  })
-})
+    const {redis} = fastify;
+    redis.set(req.body.key, req.body.value, (err) => {
+        reply.send(err || {status: 'ok'});
+    });
+});
 
-fastify.listen({ port: 3000 }, err => {
-  if (err) throw err
-  console.log(`server listening on ${fastify.server.address().port}`)
-})
+fastify.listen({port: 3000}, (err) => {
+    if (err) throw err;
+    console.log(`server listening on ${fastify.server.address().port}`);
+});
 ```
 
-By default `@fastify/redis` doesn't close 
-the client connection when Fastify server shuts down. 
+By default `@fastify/redis` doesn't close
+the client connection when Fastify server shuts down.
 To opt-in to this behavior, register the client like so:
 
 ```javascript
 fastify.register(require('@fastify/redis'), {
-  client: redis,
-  closeClient: true
-})
+    client: redis,
+    closeClient: true,
+});
 ```
 
 ### [Mongo](https://github.com/fastify/fastify-mongodb)
+
 Install the plugin by running `npm i @fastify/mongodb`
 
-*Usage:*
+_Usage:_
+
 ```javascript
-const fastify = require('fastify')()
+const fastify = require('fastify')();
 
 fastify.register(require('@fastify/mongodb'), {
-  // force to close the mongodb connection when app stopped
-  // the default value is false
-  forceClose: true,
-  
-  url: 'mongodb://mongo/mydb'
-})
+    // force to close the mongodb connection when app stopped
+    // the default value is false
+    forceClose: true,
+
+    url: 'mongodb://mongo/mydb',
+});
 
 fastify.get('/user/:id', async function (req, reply) {
-  // Or this.mongo.client.db('mydb').collection('users')
-  const users = this.mongo.db.collection('users')
+    // Or this.mongo.client.db('mydb').collection('users')
+    const users = this.mongo.db.collection('users');
 
-  // if the id is an ObjectId format, you need to create a new ObjectId
-  const id = this.mongo.ObjectId(req.params.id)
-  try {
-    const user = await users.findOne({ id })
-    return user
-  } catch (err) {
-    return err
-  }
-})
+    // if the id is an ObjectId format, you need to create a new ObjectId
+    const id = this.mongo.ObjectId(req.params.id);
+    try {
+        const user = await users.findOne({id});
+        return user;
+    } catch (err) {
+        return err;
+    }
+});
 
-fastify.listen({ port: 3000 }, err => {
-  if (err) throw err
-})
+fastify.listen({port: 3000}, (err) => {
+    if (err) throw err;
+});
 ```
 
 ### [LevelDB](https://github.com/fastify/fastify-leveldb)
+
 Install the plugin by running `npm i @fastify/leveldb`
 
-*Usage:*
-```javascript
-const fastify = require('fastify')()
+_Usage:_
 
-fastify.register(
-  require('@fastify/leveldb'),
-  { name: 'db' }
-)
+```javascript
+const fastify = require('fastify')();
+
+fastify.register(require('@fastify/leveldb'), {name: 'db'});
 
 fastify.get('/foo', async function (req, reply) {
-  const val = await this.level.db.get(req.query.key)
-  return val
-})
+    const val = await this.level.db.get(req.query.key);
+    return val;
+});
 
 fastify.post('/foo', async function (req, reply) {
-  await this.level.db.put(req.body.key, req.body.value)
-  return { status: 'ok' }
-})
+    await this.level.db.put(req.body.key, req.body.value);
+    return {status: 'ok'};
+});
 
-fastify.listen({ port: 3000 }, err => {
-  if (err) throw err
-  console.log(`server listening on ${fastify.server.address().port}`)
-})
+fastify.listen({port: 3000}, (err) => {
+    if (err) throw err;
+    console.log(`server listening on ${fastify.server.address().port}`);
+});
 ```
 
 ### Writing plugin for a database library
-We could write a plugin for a database 
-library too (e.g. Knex, Prisma, or TypeORM). 
+
+We could write a plugin for a database
+library too (e.g. Knex, Prisma, or TypeORM).
 We will use [Knex](https://knexjs.org/) in our example.
 
 ```javascript
-'use strict'
+'use strict';
 
-const fp = require('fastify-plugin')
-const knex = require('knex')
+const fp = require('fastify-plugin');
+const knex = require('knex');
 
 function knexPlugin(fastify, options, done) {
-  if(!fastify.knex) {
-    const knex = knex(options)
-    fastify.decorate('knex', knex)
+    if (!fastify.knex) {
+        const knex = knex(options);
+        fastify.decorate('knex', knex);
 
-    fastify.addHook('onClose', (fastify, done) => {
-      if (fastify.knex === knex) {
-        fastify.knex.destroy(done)
-      }
-    })
-  }
+        fastify.addHook('onClose', (fastify, done) => {
+            if (fastify.knex === knex) {
+                fastify.knex.destroy(done);
+            }
+        });
+    }
 
-  done()
+    done();
 }
 
-export default fp(knexPlugin, { name: 'fastify-knex-example' })
+export default fp(knexPlugin, {name: 'fastify-knex-example'});
 ```
 
 ### Writing a plugin for a database engine
@@ -212,22 +220,24 @@ In this example, we will create a basic Fastify MySQL plugin from scratch (it is
 a stripped-down example, please use the official plugin in production).
 
 ```javascript
-const fp = require('fastify-plugin')
-const mysql = require('mysql2/promise')
+const fp = require('fastify-plugin');
+const mysql = require('mysql2/promise');
 
 function fastifyMysql(fastify, options, done) {
-  const connection = mysql.createConnection(options)
+    const connection = mysql.createConnection(options);
 
-  if (!fastify.mysql) {
-    fastify.decorate('mysql', connection)
-  }
+    if (!fastify.mysql) {
+        fastify.decorate('mysql', connection);
+    }
 
-  fastify.addHook('onClose', (fastify, done) => connection.end().then(done).catch(done))
+    fastify.addHook('onClose', (fastify, done) =>
+        connection.end().then(done).catch(done),
+    );
 
-  done()
+    done();
 }
 
-export default fp(fastifyMysql, { name: 'fastify-mysql-example' })
+export default fp(fastifyMysql, {name: 'fastify-mysql-example'});
 ```
 
 ### Migrations
@@ -272,50 +282,51 @@ CREATE TABLE IF NOT EXISTS users (
   lastName TEXT NOT NULL
 );
 ```
+
 ```javascript
-const pg = require('pg')
-const Postgrator = require('postgrator')
-const path = require('node:path')
+const pg = require('pg');
+const Postgrator = require('postgrator');
+const path = require('node:path');
 
 async function migrate() {
-  const client = new pg.Client({
-    host: 'localhost',
-    port: 5432,
-    database: 'example', 
-    user: 'example',
-    password: 'example',
-  });
-
-  try {
-    await client.connect();
-
-    const postgrator = new Postgrator({
-      migrationPattern: path.join(__dirname, '/migrations/*'),
-      driver: 'pg',
-      database: 'example',
-      schemaTable: 'migrations',
-      currentSchema: 'public', // Postgres and MS SQL Server only
-      execQuery: (query) => client.query(query),
+    const client = new pg.Client({
+        host: 'localhost',
+        port: 5432,
+        database: 'example',
+        user: 'example',
+        password: 'example',
     });
 
-    const result = await postgrator.migrate()
+    try {
+        await client.connect();
 
-    if (result.length === 0) {
-      console.log(
-        'No migrations run for schema "public". Already at the latest one.'
-      )
+        const postgrator = new Postgrator({
+            migrationPattern: path.join(__dirname, '/migrations/*'),
+            driver: 'pg',
+            database: 'example',
+            schemaTable: 'migrations',
+            currentSchema: 'public', // Postgres and MS SQL Server only
+            execQuery: (query) => client.query(query),
+        });
+
+        const result = await postgrator.migrate();
+
+        if (result.length === 0) {
+            console.log(
+                'No migrations run for schema "public". Already at the latest one.',
+            );
+        }
+
+        console.log('Migration done.');
+
+        process.exitCode = 0;
+    } catch (err) {
+        console.error(err);
+        process.exitCode = 1;
     }
 
-    console.log('Migration done.')
-
-    process.exitCode = 0
-  } catch(err) {
-    console.error(err)
-    process.exitCode = 1
-  }
-  
-  await client.end()
+    await client.end();
 }
 
-migrate()
+migrate();
 ```

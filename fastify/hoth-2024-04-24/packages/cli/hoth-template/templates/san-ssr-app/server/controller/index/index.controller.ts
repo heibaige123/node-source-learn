@@ -3,7 +3,6 @@ import type {FastifyReply, FastifyRequest} from 'fastify';
 
 @Controller('/index')
 export default class AppController {
-
     @GET()
     async getApp(req: FastifyRequest, reply: FastifyReply) {
         const ssrPath = `${req.$appConfig.get('dir')}/ssr`;

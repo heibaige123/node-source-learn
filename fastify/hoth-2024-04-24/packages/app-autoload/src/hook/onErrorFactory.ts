@@ -10,8 +10,7 @@ export default function (name: string) {
                 err: error,
                 app: name,
             });
-        }
-        else {
+        } else {
             reply.log.fatal({
                 req,
                 res: reply,

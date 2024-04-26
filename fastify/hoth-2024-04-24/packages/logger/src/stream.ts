@@ -31,13 +31,8 @@ export default function (streamsArray) {
 
                 /* istanbul ignore next */
                 if (stream[metadata]) {
-                    const {
-                        lastTime,
-                        lastMsg,
-                        lastObj,
-                        lastLogger,
-                        lastLevel,
-                    } = this;
+                    const {lastTime, lastMsg, lastObj, lastLogger, lastLevel} =
+                        this;
                     stream.lastLevel = lastLevel;
                     stream.lastTime = lastTime;
                     stream.lastMsg = lastMsg;
@@ -58,9 +53,11 @@ export default function (streamsArray) {
         /* istanbul ignore else */
         if (isDevelopment || process.env.CONSOLE_LOG === 'true') {
             const arr = info.result.split(':');
-            arr[0] = (['FATAL', 'ERROR'].includes(arr[0]))
-                ? chalk.red(arr[0]) : (arr[0] === 'WARN')
-                    ? chalk.yellow(arr[0]) : chalk.green(arr[0]);
+            arr[0] = ['FATAL', 'ERROR'].includes(arr[0])
+                ? chalk.red(arr[0])
+                : arr[0] === 'WARN'
+                  ? chalk.yellow(arr[0])
+                  : chalk.green(arr[0]);
 
             // with \n
             process.stdout.write(arr.join(':'));
@@ -82,19 +79,24 @@ export default function (streamsArray) {
         /* istanbul ignore next */
         if (typeof dest.write === 'function') {
             return add.call(this, {stream: dest});
-        }
-        /* istanbul ignore next */
-        else if (typeof dest.levelVal === 'number') {
-            return add.call(this, Object.assign({}, dest, {level: dest.levelVal, levelVal: undefined}));
-        }
-        else if (typeof dest.level === 'string') {
-            return add.call(this, Object.assign({}, dest, {level: levels[dest.level]}));
-        }
-        /* istanbul ignore next */
-        else if (typeof dest.level !== 'number') {
+        } else if (typeof dest.levelVal === 'number') {
+            /* istanbul ignore next */
+            return add.call(
+                this,
+                Object.assign({}, dest, {
+                    level: dest.levelVal,
+                    levelVal: undefined,
+                }),
+            );
+        } else if (typeof dest.level === 'string') {
+            return add.call(
+                this,
+                Object.assign({}, dest, {level: levels[dest.level]}),
+            );
+        } else if (typeof dest.level !== 'number') {
+            /* istanbul ignore next */
             dest = Object.assign({}, dest, {level: 30});
-        }
-        else {
+        } else {
             dest = Object.assign({}, dest);
         }
         dest.id = counter++;
@@ -107,10 +109,12 @@ export default function (streamsArray) {
     }
 
     function clone(level) {
-        let streams = new Array(this.streams.length).map(/* istanbul ignore next */ (_, i) => ({
-            level: level,
-            stream: this.streams[i].stream,
-        }));
+        let streams = new Array(this.streams.length).map(
+            /* istanbul ignore next */ (_, i) => ({
+                level: level,
+                stream: this.streams[i].stream,
+            }),
+        );
 
         return {
             write,

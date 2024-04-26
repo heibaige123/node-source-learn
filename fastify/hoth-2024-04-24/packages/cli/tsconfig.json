@@ -5,9 +5,9 @@
         "outDir": "dist"
     },
     "references": [
-        { "path": "../utils" },
-        { "path": "../app-autoload" },
-        { "path": "../logger" }
+        {"path": "../utils"},
+        {"path": "../app-autoload"},
+        {"path": "../logger"}
     ],
     "exclude": ["./hoth-template/**/*.ts", "dist/*", "__tests__/*"]
 }

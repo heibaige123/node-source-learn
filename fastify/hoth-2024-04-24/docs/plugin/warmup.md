@@ -12,9 +12,9 @@ warmup.ts 中的内容为 [fastify-warmup](https://github.com/searchfe/fastify-w
 import type {WarmupConf} from 'fastify-warmup';
 export default {
     warmupData: {
-        '/index': 'a.json'
+        '/index': 'a.json',
     },
-    maxConcurrent: 3
+    maxConcurrent: 3,
 } as WarmupConf;
 ```
 

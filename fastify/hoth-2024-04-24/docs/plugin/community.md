@@ -9,7 +9,10 @@ import type {FastifyInstance} from 'fastify';
 import type {AppConfig} from '@hoth/app-autoload';
 import SomeFastifyPlugin from 'fastify-xxx';
 
-export default async function main(fastify: FastifyInstance, config: AppConfig) {
+export default async function main(
+    fastify: FastifyInstance,
+    config: AppConfig,
+) {
     fastify.register(SomeFastifyPlugin);
     return fastify;
 }
@@ -26,12 +29,15 @@ import path from 'path';
 import type {FastifyInstance} from 'fastify';
 import type {AppConfig} from '@hoth/app-autoload';
 import fastifyRedis from 'fastify-redis';
-export default async function main(fastify: FastifyInstance, config: AppConfig) {
-    await fastify.register(fastifyRedis, { 
-        host: '127.0.0.1', 
+export default async function main(
+    fastify: FastifyInstance,
+    config: AppConfig,
+) {
+    await fastify.register(fastifyRedis, {
+        host: '127.0.0.1',
         password: '***',
         port: 6379, // Redis port
-        family: 4   // 4 (IPv4) or 6 (IPv6)
+        family: 4, // 4 (IPv4) or 6 (IPv6)
     });
     return fastify;
 }
@@ -47,20 +53,32 @@ export default async function main(fastify: FastifyInstance, config: AppConfig) 
 // src/plugin/sequelize.ts
 import type {FastifyInstance} from 'fastify';
 import fp from 'fastify-plugin';
-import {Sequelize, Options as SequelizeOptions, DataTypes, Model} from 'sequelize';
+import {
+    Sequelize,
+    Options as SequelizeOptions,
+    DataTypes,
+    Model,
+} from 'sequelize';
 
 function initModels(sequelize: Sequelize) {
-    sequelize.define('XXX', {
-        name: {
-            type: DataTypes.STRING,
+    sequelize.define(
+        'XXX',
+        {
+            name: {
+                type: DataTypes.STRING,
+            },
         },
-    }, {
-        tableName: 'xxx',
-        timestamps: false,
-    });
+        {
+            tableName: 'xxx',
+            timestamps: false,
+        },
+    );
 }
 
-export default fp(async function (fastify: FastifyInstance, opts: SequelizeOptions) {
+export default fp(async function (
+    fastify: FastifyInstance,
+    opts: SequelizeOptions,
+) {
     const sequelize = new Sequelize(opts);
 
     initModels(sequelize);
@@ -69,7 +87,10 @@ export default fp(async function (fastify: FastifyInstance, opts: SequelizeOptio
 
     fastify.decorate('sequelize', sequelize);
     fastify.addHook('onClose', (fastifyInstance, done) => {
-        sequelize.close().then(() => done()).catch(e => done(e));
+        sequelize
+            .close()
+            .then(() => done())
+            .catch((e) => done(e));
     });
 });
 
@@ -94,16 +115,17 @@ import path from 'path';
 import type {FastifyInstance} from 'fastify';
 import type {AppConfig} from '@hoth/app-autoload';
 import fastifyStatic from 'fastify-static';
-export default async function main(fastify: FastifyInstance, config: AppConfig) {
+export default async function main(
+    fastify: FastifyInstance,
+    config: AppConfig,
+) {
     await fastify.register(fastifyStatic, {
         root: path.join(__dirname, './public'),
         prefix: '/public/',
     });
     return fastify;
 }
-
 ```
-
 
 ## fastify-swagger
 
@@ -116,7 +138,10 @@ import type {FastifyInstance} from 'fastify';
 import type {AppConfig} from '@hoth/app-autoload';
 import swagger from 'fastify-swagger';
 
-export default async function main(fastify: FastifyInstance, config: AppConfig) {
+export default async function main(
+    fastify: FastifyInstance,
+    config: AppConfig,
+) {
     fastify.register(helmet, {contentSecurityPolicy: false});
     return fastify;
 }
@@ -130,7 +155,10 @@ import type {AppConfig} from '@hoth/app-autoload';
 import helmet from 'fastify-helmet';
 import swagger from 'fastify-swagger';
 
-export default async function main(fastify: FastifyInstance, config: AppConfig) {
+export default async function main(
+    fastify: FastifyInstance,
+    config: AppConfig,
+) {
     fastify.register(swagger, {
         routePrefix: '/documentation',
         exposeRoute: true,

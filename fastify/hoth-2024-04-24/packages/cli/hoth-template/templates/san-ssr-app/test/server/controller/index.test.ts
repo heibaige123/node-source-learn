@@ -18,21 +18,23 @@ describe('Controller: AppController', () => {
                 fp(async (fastify: FastifyInstance) => {
                     fastify.decorateRequest('$appConfig', {
                         get() {
-                            return path.resolve(__dirname, '../../../dist')
-                        }
+                            return path.resolve(__dirname, '../../../dist');
+                        },
                     });
                     fastify.register(view, {
                         engine: {swig},
-                        templatesDir: path.resolve(__dirname, '../../../dist/view')
+                        templatesDir: path.resolve(
+                            __dirname,
+                            '../../../dist/view',
+                        ),
                     });
-                })
-            ]
+                }),
+            ],
         });
     });
     afterEach(() => jest.restoreAllMocks());
 
     it('get /index', async () => {
-
         const result = await instance.inject({
             url: '/index',
             method: 'GET',

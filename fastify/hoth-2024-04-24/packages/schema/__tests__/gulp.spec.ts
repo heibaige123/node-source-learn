@@ -7,16 +7,18 @@ jest.setTimeout(30000);
 
 describe('hoth schema gulp', () => {
     it('compile ts', async () => {
-        const contents = await fs.readFile(path.resolve(__dirname, './sample/index.ts'));
+        const contents = await fs.readFile(
+            path.resolve(__dirname, './sample/index.ts'),
+        );
         const fakeFile = new File({
             path: path.resolve(__dirname, './sample/index.ts'),
-            contents
+            contents,
         });
 
         const gulpPlugin = compileInterface({fileName: 'outputFile.json'});
 
-        await new Promise(resolve => {
-            gulpPlugin.once('data', file => {
+        await new Promise((resolve) => {
+            gulpPlugin.once('data', (file) => {
                 expect(file._isVinyl).toBeTruthy();
                 expect(file.path.endsWith('outputFile.json')).toBeTruthy();
                 resolve(0);

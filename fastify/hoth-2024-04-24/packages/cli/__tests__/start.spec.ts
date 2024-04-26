@@ -3,12 +3,13 @@ import {start} from '../src/start';
 import {mockProcessExit, mockConsoleLog} from 'jest-mock-process';
 import {noop} from '@hoth/utils';
 
-let processExitCallback: (_: any) => Promise<void> = () => Promise.resolve(undefined);
+let processExitCallback: (_: any) => Promise<void> = () =>
+    Promise.resolve(undefined);
 jest.mock('close-with-grace', () => {
     return function (_: any, cb: (_: any) => Promise<void>) {
         processExitCallback = cb;
         return {
-            uninstall: noop
+            uninstall: noop,
         };
     };
 });
@@ -18,7 +19,6 @@ function triggerExit(signal: string, err: null | Error, manual: boolean) {
 }
 
 describe('hoth cli start', () => {
-
     it('show help', async () => {
         const mockLog = mockConsoleLog();
         const mockExit = mockProcessExit();
@@ -41,7 +41,9 @@ describe('hoth cli start', () => {
 
         const fastifyInstance = await start([]);
 
-        expect(mockLog).toHaveBeenCalledWith('Server listening on http://127.0.0.1:8250.');
+        expect(mockLog).toHaveBeenCalledWith(
+            'Server listening on http://127.0.0.1:8250.',
+        );
         expect(mockExit).not.toHaveBeenCalled();
         expect(mockSend).toHaveBeenCalledWith('ready');
         expect(mockSend).toHaveBeenCalledTimes(2);
@@ -61,7 +63,9 @@ describe('hoth cli start', () => {
 
         const fastifyInstance = await start([]);
 
-        expect(mockLog).toHaveBeenCalledWith('Warn: app root "app" not exists!');
+        expect(mockLog).toHaveBeenCalledWith(
+            'Warn: app root "app" not exists!',
+        );
         expect(mockExit).toHaveBeenCalledWith(1);
         expect(fastifyInstance).toBeFalsy();
         mockExit.mockRestore();
@@ -73,9 +77,14 @@ describe('hoth cli start', () => {
         const mockLog = mockConsoleLog();
         process.env.ROOT_PATH = join(__dirname, 'testapp');
 
-        const fastifyInstance = await start(['--healthcheck-path="/healthcheck"', '--port=8252']);
+        const fastifyInstance = await start([
+            '--healthcheck-path="/healthcheck"',
+            '--port=8252',
+        ]);
 
-        expect(mockLog.mock.calls[mockLog.mock.calls.length - 1][1]).toContain('/healthcheck (GET)');
+        expect(mockLog.mock.calls[mockLog.mock.calls.length - 1][1]).toContain(
+            '/healthcheck (GET)',
+        );
         expect(mockExit).not.toHaveBeenCalled();
         mockExit.mockRestore();
         mockLog.mockRestore();
@@ -83,7 +92,7 @@ describe('hoth cli start', () => {
         if (fastifyInstance) {
             const res = await fastifyInstance.inject({
                 method: 'GET',
-                path: '/healthcheck'
+                path: '/healthcheck',
             });
 
             expect(res.body).toBe('ok');
@@ -126,13 +135,15 @@ describe('hoth cli start', () => {
     });
 
     describe('close with grace', function () {
-
         it('SIGTERM', async () => {
             const mockExit = mockProcessExit();
             const mockLog = mockConsoleLog();
             process.env.ROOT_PATH = join(__dirname, 'testapp');
 
-            const fastifyInstance = await start(['--port=8251', '--address=0.0.0.0']);
+            const fastifyInstance = await start([
+                '--port=8251',
+                '--address=0.0.0.0',
+            ]);
 
             if (!fastifyInstance) {
                 return;
@@ -162,7 +173,11 @@ describe('hoth cli start', () => {
 
             const mockClose = jest.spyOn(fastifyInstance, 'close');
 
-            triggerExit('uncaughtException', new TypeError('some error'), false);
+            triggerExit(
+                'uncaughtException',
+                new TypeError('some error'),
+                false,
+            );
             expect(mockClose).toHaveBeenCalled();
             expect(mockExit).toHaveBeenCalled();
 
@@ -170,6 +185,5 @@ describe('hoth cli start', () => {
             mockLog.mockRestore();
             mockClose.mockRestore();
         });
-
     });
 });

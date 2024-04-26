@@ -4,7 +4,6 @@ import VueSsrEngine from '../../lib/vue-ssr-engine/index.service';
 
 @Controller('/index')
 export default class AppController {
-
     @Inject(VueSsrEngine)
     private readonly engine!: VueSsrEngine;
 

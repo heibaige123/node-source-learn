@@ -1,691 +1,750 @@
-'use strict'
+'use strict';
 
-const t = require('tap')
-const test = t.test
-const sget = require('simple-get').concat
-const Fastify = require('..')
-const split = require('split2')
-const pino = require('pino')
-const { sleep } = require('./helper')
-const statusCodes = require('node:http').STATUS_CODES
+const t = require('tap');
+const test = t.test;
+const sget = require('simple-get').concat;
+const Fastify = require('..');
+const split = require('split2');
+const pino = require('pino');
+const {sleep} = require('./helper');
+const statusCodes = require('node:http').STATUS_CODES;
 
 const opts = {
-  schema: {
-    response: {
-      '2xx': {
-        type: 'object',
-        properties: {
-          hello: {
-            type: 'string'
-          }
-        }
-      }
+    schema: {
+        response: {
+            '2xx': {
+                type: 'object',
+                properties: {
+                    hello: {
+                        type: 'string',
+                    },
+                },
+            },
+        },
+    },
+};
+
+test('async await', (t) => {
+    t.plan(11);
+    const fastify = Fastify();
+    try {
+        fastify.get('/', opts, async function awaitMyFunc(req, reply) {
+            await sleep(200);
+            return {hello: 'world'};
+        });
+        t.pass();
+    } catch (e) {
+        t.fail();
     }
-  }
-}
 
-test('async await', t => {
-  t.plan(11)
-  const fastify = Fastify()
-  try {
-    fastify.get('/', opts, async function awaitMyFunc (req, reply) {
-      await sleep(200)
-      return { hello: 'world' }
-    })
-    t.pass()
-  } catch (e) {
-    t.fail()
-  }
-
-  try {
-    fastify.get('/no-await', opts, async function (req, reply) {
-      return { hello: 'world' }
-    })
-    t.pass()
-  } catch (e) {
-    t.fail()
-  }
-
-  fastify.listen({ port: 0 }, err => {
-    t.error(err)
-    t.teardown(() => { fastify.close() })
-
-    sget({
-      method: 'GET',
-      url: 'http://localhost:' + fastify.server.address().port
-    }, (err, response, body) => {
-      t.error(err)
-      t.equal(response.statusCode, 200)
-      t.equal(response.headers['content-length'], '' + body.length)
-      t.same(JSON.parse(body), { hello: 'world' })
-    })
-
-    sget({
-      method: 'GET',
-      url: 'http://localhost:' + fastify.server.address().port + '/no-await'
-    }, (err, response, body) => {
-      t.error(err)
-      t.equal(response.statusCode, 200)
-      t.equal(response.headers['content-length'], '' + body.length)
-      t.same(JSON.parse(body), { hello: 'world' })
-    })
-  })
-})
-
-test('ignore the result of the promise if reply.send is called beforehand (undefined)', t => {
-  t.plan(4)
-
-  const server = Fastify()
-  const payload = { hello: 'world' }
-
-  server.get('/', async function awaitMyFunc (req, reply) {
-    await reply.send(payload)
-  })
-
-  t.teardown(server.close.bind(server))
-
-  server.listen({ port: 0 }, (err) => {
-    t.error(err)
-    sget({
-      method: 'GET',
-      url: 'http://localhost:' + server.server.address().port + '/'
-    }, (err, res, body) => {
-      t.error(err)
-      t.same(payload, JSON.parse(body))
-      t.equal(res.statusCode, 200)
-    })
-  })
-})
-
-test('ignore the result of the promise if reply.send is called beforehand (object)', t => {
-  t.plan(4)
-
-  const server = Fastify()
-  const payload = { hello: 'world2' }
-
-  server.get('/', async function awaitMyFunc (req, reply) {
-    await reply.send(payload)
-    return { hello: 'world' }
-  })
-
-  t.teardown(server.close.bind(server))
-
-  server.listen({ port: 0 }, (err) => {
-    t.error(err)
-    sget({
-      method: 'GET',
-      url: 'http://localhost:' + server.server.address().port + '/'
-    }, (err, res, body) => {
-      t.error(err)
-      t.same(payload, JSON.parse(body))
-      t.equal(res.statusCode, 200)
-    })
-  })
-})
-
-test('server logs an error if reply.send is called and a value is returned via async/await', t => {
-  const lines = ['incoming request', 'request completed', 'Reply was already sent, did you forget to "return reply" in "/" (GET)?']
-  t.plan(lines.length + 2)
-
-  const splitStream = split(JSON.parse)
-  splitStream.on('data', (line) => {
-    t.equal(line.msg, lines.shift())
-  })
-
-  const logger = pino(splitStream)
-
-  const fastify = Fastify({
-    logger
-  })
-
-  fastify.get('/', async (req, reply) => {
-    await reply.send({ hello: 'world' })
-    return { hello: 'world2' }
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/'
-  }, (err, res) => {
-    t.error(err)
-    const payload = JSON.parse(res.payload)
-    t.same(payload, { hello: 'world' })
-  })
-})
-
-test('ignore the result of the promise if reply.send is called beforehand (undefined)', t => {
-  t.plan(4)
-
-  const server = Fastify()
-  const payload = { hello: 'world' }
-
-  server.get('/', async function awaitMyFunc (req, reply) {
-    await reply.send(payload)
-  })
-
-  t.teardown(server.close.bind(server))
-
-  server.listen({ port: 0 }, (err) => {
-    t.error(err)
-    sget({
-      method: 'GET',
-      url: 'http://localhost:' + server.server.address().port + '/'
-    }, (err, res, body) => {
-      t.error(err)
-      t.same(payload, JSON.parse(body))
-      t.equal(res.statusCode, 200)
-    })
-  })
-})
-
-test('ignore the result of the promise if reply.send is called beforehand (object)', t => {
-  t.plan(4)
-
-  const server = Fastify()
-  const payload = { hello: 'world2' }
-
-  server.get('/', async function awaitMyFunc (req, reply) {
-    await reply.send(payload)
-    return { hello: 'world' }
-  })
-
-  t.teardown(server.close.bind(server))
-
-  server.listen({ port: 0 }, (err) => {
-    t.error(err)
-    sget({
-      method: 'GET',
-      url: 'http://localhost:' + server.server.address().port + '/'
-    }, (err, res, body) => {
-      t.error(err)
-      t.same(payload, JSON.parse(body))
-      t.equal(res.statusCode, 200)
-    })
-  })
-})
-
-test('await reply if we will be calling reply.send in the future', t => {
-  const lines = ['incoming request', 'request completed']
-  t.plan(lines.length + 2)
-
-  const splitStream = split(JSON.parse)
-  splitStream.on('data', (line) => {
-    t.equal(line.msg, lines.shift())
-  })
-
-  const server = Fastify({
-    logger: {
-      stream: splitStream
+    try {
+        fastify.get('/no-await', opts, async function (req, reply) {
+            return {hello: 'world'};
+        });
+        t.pass();
+    } catch (e) {
+        t.fail();
     }
-  })
-  const payload = { hello: 'world' }
 
-  server.get('/', async function awaitMyFunc (req, reply) {
-    setImmediate(function () {
-      reply.send(payload)
-    })
+    fastify.listen({port: 0}, (err) => {
+        t.error(err);
+        t.teardown(() => {
+            fastify.close();
+        });
 
-    await reply
-  })
+        sget(
+            {
+                method: 'GET',
+                url: 'http://localhost:' + fastify.server.address().port,
+            },
+            (err, response, body) => {
+                t.error(err);
+                t.equal(response.statusCode, 200);
+                t.equal(response.headers['content-length'], '' + body.length);
+                t.same(JSON.parse(body), {hello: 'world'});
+            },
+        );
 
-  server.inject({
-    method: 'GET',
-    url: '/'
-  }, (err, res) => {
-    t.error(err)
-    const payload = JSON.parse(res.payload)
-    t.same(payload, { hello: 'world' })
-  })
-})
+        sget(
+            {
+                method: 'GET',
+                url:
+                    'http://localhost:' +
+                    fastify.server.address().port +
+                    '/no-await',
+            },
+            (err, response, body) => {
+                t.error(err);
+                t.equal(response.statusCode, 200);
+                t.equal(response.headers['content-length'], '' + body.length);
+                t.same(JSON.parse(body), {hello: 'world'});
+            },
+        );
+    });
+});
 
-test('await reply if we will be calling reply.send in the future (error case)', t => {
-  const lines = ['incoming request', 'kaboom', 'request completed']
-  t.plan(lines.length + 2)
+test('ignore the result of the promise if reply.send is called beforehand (undefined)', (t) => {
+    t.plan(4);
 
-  const splitStream = split(JSON.parse)
-  splitStream.on('data', (line) => {
-    t.equal(line.msg, lines.shift())
-  })
+    const server = Fastify();
+    const payload = {hello: 'world'};
 
-  const server = Fastify({
-    logger: {
-      stream: splitStream
-    }
-  })
+    server.get('/', async function awaitMyFunc(req, reply) {
+        await reply.send(payload);
+    });
 
-  server.get('/', async function awaitMyFunc (req, reply) {
-    setImmediate(function () {
-      reply.send(new Error('kaboom'))
-    })
+    t.teardown(server.close.bind(server));
 
-    await reply
-  })
+    server.listen({port: 0}, (err) => {
+        t.error(err);
+        sget(
+            {
+                method: 'GET',
+                url: 'http://localhost:' + server.server.address().port + '/',
+            },
+            (err, res, body) => {
+                t.error(err);
+                t.same(payload, JSON.parse(body));
+                t.equal(res.statusCode, 200);
+            },
+        );
+    });
+});
 
-  server.inject({
-    method: 'GET',
-    url: '/'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 500)
-  })
-})
+test('ignore the result of the promise if reply.send is called beforehand (object)', (t) => {
+    t.plan(4);
 
-test('support reply decorators with await', t => {
-  t.plan(2)
+    const server = Fastify();
+    const payload = {hello: 'world2'};
 
-  const fastify = Fastify()
+    server.get('/', async function awaitMyFunc(req, reply) {
+        await reply.send(payload);
+        return {hello: 'world'};
+    });
 
-  fastify.decorateReply('wow', function () {
-    setImmediate(() => {
-      this.send({ hello: 'world' })
-    })
+    t.teardown(server.close.bind(server));
 
-    return this
-  })
+    server.listen({port: 0}, (err) => {
+        t.error(err);
+        sget(
+            {
+                method: 'GET',
+                url: 'http://localhost:' + server.server.address().port + '/',
+            },
+            (err, res, body) => {
+                t.error(err);
+                t.same(payload, JSON.parse(body));
+                t.equal(res.statusCode, 200);
+            },
+        );
+    });
+});
 
-  fastify.get('/', async (req, reply) => {
-    await sleep(1)
-    await reply.wow()
-  })
+test('server logs an error if reply.send is called and a value is returned via async/await', (t) => {
+    const lines = [
+        'incoming request',
+        'request completed',
+        'Reply was already sent, did you forget to "return reply" in "/" (GET)?',
+    ];
+    t.plan(lines.length + 2);
 
-  fastify.inject({
-    method: 'GET',
-    url: '/'
-  }, (err, res) => {
-    t.error(err)
-    const payload = JSON.parse(res.payload)
-    t.same(payload, { hello: 'world' })
-  })
-})
+    const splitStream = split(JSON.parse);
+    splitStream.on('data', (line) => {
+        t.equal(line.msg, lines.shift());
+    });
 
-test('inject async await', async t => {
-  t.plan(1)
+    const logger = pino(splitStream);
 
-  const fastify = Fastify()
+    const fastify = Fastify({
+        logger,
+    });
 
-  fastify.get('/', (req, reply) => {
-    reply.send({ hello: 'world' })
-  })
+    fastify.get('/', async (req, reply) => {
+        await reply.send({hello: 'world'});
+        return {hello: 'world2'};
+    });
 
-  try {
-    const res = await fastify.inject({ method: 'GET', url: '/' })
-    t.same({ hello: 'world' }, JSON.parse(res.payload))
-  } catch (err) {
-    t.fail(err)
-  }
-})
+    fastify.inject(
+        {
+            method: 'GET',
+            url: '/',
+        },
+        (err, res) => {
+            t.error(err);
+            const payload = JSON.parse(res.payload);
+            t.same(payload, {hello: 'world'});
+        },
+    );
+});
 
-test('inject async await - when the server equal up', async t => {
-  t.plan(2)
+test('ignore the result of the promise if reply.send is called beforehand (undefined)', (t) => {
+    t.plan(4);
 
-  const fastify = Fastify()
+    const server = Fastify();
+    const payload = {hello: 'world'};
 
-  fastify.get('/', (req, reply) => {
-    reply.send({ hello: 'world' })
-  })
+    server.get('/', async function awaitMyFunc(req, reply) {
+        await reply.send(payload);
+    });
 
-  try {
-    const res = await fastify.inject({ method: 'GET', url: '/' })
-    t.same({ hello: 'world' }, JSON.parse(res.payload))
-  } catch (err) {
-    t.fail(err)
-  }
+    t.teardown(server.close.bind(server));
 
-  await sleep(200)
+    server.listen({port: 0}, (err) => {
+        t.error(err);
+        sget(
+            {
+                method: 'GET',
+                url: 'http://localhost:' + server.server.address().port + '/',
+            },
+            (err, res, body) => {
+                t.error(err);
+                t.same(payload, JSON.parse(body));
+                t.equal(res.statusCode, 200);
+            },
+        );
+    });
+});
 
-  try {
-    const res2 = await fastify.inject({ method: 'GET', url: '/' })
-    t.same({ hello: 'world' }, JSON.parse(res2.payload))
-  } catch (err) {
-    t.fail(err)
-  }
-})
+test('ignore the result of the promise if reply.send is called beforehand (object)', (t) => {
+    t.plan(4);
 
-test('async await plugin', async t => {
-  t.plan(1)
+    const server = Fastify();
+    const payload = {hello: 'world2'};
 
-  const fastify = Fastify()
+    server.get('/', async function awaitMyFunc(req, reply) {
+        await reply.send(payload);
+        return {hello: 'world'};
+    });
 
-  fastify.register(async (fastify, opts) => {
+    t.teardown(server.close.bind(server));
+
+    server.listen({port: 0}, (err) => {
+        t.error(err);
+        sget(
+            {
+                method: 'GET',
+                url: 'http://localhost:' + server.server.address().port + '/',
+            },
+            (err, res, body) => {
+                t.error(err);
+                t.same(payload, JSON.parse(body));
+                t.equal(res.statusCode, 200);
+            },
+        );
+    });
+});
+
+test('await reply if we will be calling reply.send in the future', (t) => {
+    const lines = ['incoming request', 'request completed'];
+    t.plan(lines.length + 2);
+
+    const splitStream = split(JSON.parse);
+    splitStream.on('data', (line) => {
+        t.equal(line.msg, lines.shift());
+    });
+
+    const server = Fastify({
+        logger: {
+            stream: splitStream,
+        },
+    });
+    const payload = {hello: 'world'};
+
+    server.get('/', async function awaitMyFunc(req, reply) {
+        setImmediate(function () {
+            reply.send(payload);
+        });
+
+        await reply;
+    });
+
+    server.inject(
+        {
+            method: 'GET',
+            url: '/',
+        },
+        (err, res) => {
+            t.error(err);
+            const payload = JSON.parse(res.payload);
+            t.same(payload, {hello: 'world'});
+        },
+    );
+});
+
+test('await reply if we will be calling reply.send in the future (error case)', (t) => {
+    const lines = ['incoming request', 'kaboom', 'request completed'];
+    t.plan(lines.length + 2);
+
+    const splitStream = split(JSON.parse);
+    splitStream.on('data', (line) => {
+        t.equal(line.msg, lines.shift());
+    });
+
+    const server = Fastify({
+        logger: {
+            stream: splitStream,
+        },
+    });
+
+    server.get('/', async function awaitMyFunc(req, reply) {
+        setImmediate(function () {
+            reply.send(new Error('kaboom'));
+        });
+
+        await reply;
+    });
+
+    server.inject(
+        {
+            method: 'GET',
+            url: '/',
+        },
+        (err, res) => {
+            t.error(err);
+            t.equal(res.statusCode, 500);
+        },
+    );
+});
+
+test('support reply decorators with await', (t) => {
+    t.plan(2);
+
+    const fastify = Fastify();
+
+    fastify.decorateReply('wow', function () {
+        setImmediate(() => {
+            this.send({hello: 'world'});
+        });
+
+        return this;
+    });
+
+    fastify.get('/', async (req, reply) => {
+        await sleep(1);
+        await reply.wow();
+    });
+
+    fastify.inject(
+        {
+            method: 'GET',
+            url: '/',
+        },
+        (err, res) => {
+            t.error(err);
+            const payload = JSON.parse(res.payload);
+            t.same(payload, {hello: 'world'});
+        },
+    );
+});
+
+test('inject async await', async (t) => {
+    t.plan(1);
+
+    const fastify = Fastify();
+
     fastify.get('/', (req, reply) => {
-      reply.send({ hello: 'world' })
-    })
+        reply.send({hello: 'world'});
+    });
 
-    await sleep(200)
-  })
-
-  try {
-    const res = await fastify.inject({ method: 'GET', url: '/' })
-    t.same({ hello: 'world' }, JSON.parse(res.payload))
-  } catch (err) {
-    t.fail(err)
-  }
-})
-
-test('does not call reply.send() twice if 204 response equal already sent', t => {
-  t.plan(2)
-
-  const fastify = Fastify()
-
-  fastify.get('/', async (req, reply) => {
-    reply.code(204).send()
-    reply.send = () => {
-      throw new Error('reply.send() was called twice')
+    try {
+        const res = await fastify.inject({method: 'GET', url: '/'});
+        t.same({hello: 'world'}, JSON.parse(res.payload));
+    } catch (err) {
+        t.fail(err);
     }
-  })
+});
 
-  fastify.inject({
-    method: 'GET',
-    url: '/'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 204)
-  })
-})
+test('inject async await - when the server equal up', async (t) => {
+    t.plan(2);
 
-test('promise was fulfilled with undefined', t => {
-  t.plan(4)
+    const fastify = Fastify();
 
-  let fastify = null
-  const stream = split(JSON.parse)
-  try {
-    fastify = Fastify({
-      logger: {
-        stream,
-        level: 'error'
-      }
-    })
-  } catch (e) {
-    t.fail()
-  }
+    fastify.get('/', (req, reply) => {
+        reply.send({hello: 'world'});
+    });
 
-  t.teardown(fastify.close.bind(fastify))
+    try {
+        const res = await fastify.inject({method: 'GET', url: '/'});
+        t.same({hello: 'world'}, JSON.parse(res.payload));
+    } catch (err) {
+        t.fail(err);
+    }
 
-  fastify.get('/', async (req, reply) => {
-  })
+    await sleep(200);
 
-  stream.once('data', line => {
-    t.fail('should not log an error')
-  })
+    try {
+        const res2 = await fastify.inject({method: 'GET', url: '/'});
+        t.same({hello: 'world'}, JSON.parse(res2.payload));
+    } catch (err) {
+        t.fail(err);
+    }
+});
 
-  fastify.listen({ port: 0 }, (err) => {
-    t.error(err)
-    t.teardown(() => { fastify.close() })
+test('async await plugin', async (t) => {
+    t.plan(1);
 
-    sget({
-      method: 'GET',
-      url: 'http://localhost:' + fastify.server.address().port + '/'
-    }, (err, res, body) => {
-      t.error(err)
-      t.equal(res.body, undefined)
-      t.equal(res.statusCode, 200)
-    })
-  })
-})
+    const fastify = Fastify();
+
+    fastify.register(async (fastify, opts) => {
+        fastify.get('/', (req, reply) => {
+            reply.send({hello: 'world'});
+        });
+
+        await sleep(200);
+    });
+
+    try {
+        const res = await fastify.inject({method: 'GET', url: '/'});
+        t.same({hello: 'world'}, JSON.parse(res.payload));
+    } catch (err) {
+        t.fail(err);
+    }
+});
+
+test('does not call reply.send() twice if 204 response equal already sent', (t) => {
+    t.plan(2);
+
+    const fastify = Fastify();
+
+    fastify.get('/', async (req, reply) => {
+        reply.code(204).send();
+        reply.send = () => {
+            throw new Error('reply.send() was called twice');
+        };
+    });
+
+    fastify.inject(
+        {
+            method: 'GET',
+            url: '/',
+        },
+        (err, res) => {
+            t.error(err);
+            t.equal(res.statusCode, 204);
+        },
+    );
+});
+
+test('promise was fulfilled with undefined', (t) => {
+    t.plan(4);
+
+    let fastify = null;
+    const stream = split(JSON.parse);
+    try {
+        fastify = Fastify({
+            logger: {
+                stream,
+                level: 'error',
+            },
+        });
+    } catch (e) {
+        t.fail();
+    }
+
+    t.teardown(fastify.close.bind(fastify));
+
+    fastify.get('/', async (req, reply) => {});
+
+    stream.once('data', (line) => {
+        t.fail('should not log an error');
+    });
+
+    fastify.listen({port: 0}, (err) => {
+        t.error(err);
+        t.teardown(() => {
+            fastify.close();
+        });
+
+        sget(
+            {
+                method: 'GET',
+                url: 'http://localhost:' + fastify.server.address().port + '/',
+            },
+            (err, res, body) => {
+                t.error(err);
+                t.equal(res.body, undefined);
+                t.equal(res.statusCode, 200);
+            },
+        );
+    });
+});
 
 test('promise was fulfilled with undefined using inject', async (t) => {
-  const stream = split(JSON.parse)
-  const fastify = Fastify({
-    logger: {
-      stream,
-      level: 'error'
+    const stream = split(JSON.parse);
+    const fastify = Fastify({
+        logger: {
+            stream,
+            level: 'error',
+        },
+    });
+
+    fastify.get('/', async (req, reply) => {});
+
+    stream.once('data', (line) => {
+        t.fail('should not log an error');
+    });
+
+    const res = await fastify.inject('/');
+
+    t.equal(res.body, '');
+    t.equal(res.statusCode, 200);
+});
+
+test('error is not logged because promise was fulfilled with undefined but response was sent before promise resolution', (t) => {
+    t.plan(4);
+
+    let fastify = null;
+    const stream = split(JSON.parse);
+    const payload = {hello: 'world'};
+    try {
+        fastify = Fastify({
+            logger: {
+                stream,
+                level: 'error',
+            },
+        });
+    } catch (e) {
+        t.fail();
     }
-  })
 
-  fastify.get('/', async (req, reply) => {
-  })
+    t.teardown(fastify.close.bind(fastify));
 
-  stream.once('data', line => {
-    t.fail('should not log an error')
-  })
+    fastify.get('/', async (req, reply) => {
+        reply.send(payload);
+    });
 
-  const res = await fastify.inject('/')
+    stream.once('data', (line) => {
+        t.fail('should not log an error');
+    });
 
-  t.equal(res.body, '')
-  t.equal(res.statusCode, 200)
-})
+    fastify.listen({port: 0}, (err) => {
+        t.error(err);
+        t.teardown(() => {
+            fastify.close();
+        });
 
-test('error is not logged because promise was fulfilled with undefined but response was sent before promise resolution', t => {
-  t.plan(4)
+        sget(
+            {
+                method: 'GET',
+                url: 'http://localhost:' + fastify.server.address().port + '/',
+            },
+            (err, res, body) => {
+                t.error(err);
+                t.equal(res.statusCode, 200);
+                t.same(payload, JSON.parse(body));
+            },
+        );
+    });
+});
 
-  let fastify = null
-  const stream = split(JSON.parse)
-  const payload = { hello: 'world' }
-  try {
-    fastify = Fastify({
-      logger: {
-        stream,
-        level: 'error'
-      }
-    })
-  } catch (e) {
-    t.fail()
-  }
+test('Thrown Error instance sets HTTP status code', (t) => {
+    t.plan(3);
 
-  t.teardown(fastify.close.bind(fastify))
+    const fastify = Fastify();
 
-  fastify.get('/', async (req, reply) => {
-    reply.send(payload)
-  })
+    const err = new Error('winter is coming');
+    err.statusCode = 418;
 
-  stream.once('data', line => {
-    t.fail('should not log an error')
-  })
+    fastify.get('/', async (req, reply) => {
+        throw err;
+    });
 
-  fastify.listen({ port: 0 }, (err) => {
-    t.error(err)
-    t.teardown(() => { fastify.close() })
+    fastify.inject(
+        {
+            method: 'GET',
+            url: '/',
+        },
+        (error, res) => {
+            t.error(error);
+            t.equal(res.statusCode, 418);
+            t.same(
+                {
+                    error: statusCodes['418'],
+                    message: err.message,
+                    statusCode: 418,
+                },
+                JSON.parse(res.payload),
+            );
+        },
+    );
+});
 
-    sget({
-      method: 'GET',
-      url: 'http://localhost:' + fastify.server.address().port + '/'
-    }, (err, res, body) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(
-        payload,
-        JSON.parse(body)
-      )
-    })
-  })
-})
+test('customErrorHandler support', (t) => {
+    t.plan(4);
 
-test('Thrown Error instance sets HTTP status code', t => {
-  t.plan(3)
+    const fastify = Fastify();
 
-  const fastify = Fastify()
+    fastify.get('/', async (req, reply) => {
+        const error = new Error('ouch');
+        error.statusCode = 400;
+        throw error;
+    });
 
-  const err = new Error('winter is coming')
-  err.statusCode = 418
+    fastify.setErrorHandler(async (err) => {
+        t.equal(err.message, 'ouch');
+        const error = new Error('kaboom');
+        error.statusCode = 401;
+        throw error;
+    });
 
-  fastify.get('/', async (req, reply) => {
-    throw err
-  })
+    fastify.inject(
+        {
+            method: 'GET',
+            url: '/',
+        },
+        (err, res) => {
+            t.error(err);
+            t.equal(res.statusCode, 401);
+            t.same(
+                {
+                    error: statusCodes['401'],
+                    message: 'kaboom',
+                    statusCode: 401,
+                },
+                JSON.parse(res.payload),
+            );
+        },
+    );
+});
 
-  fastify.inject({
-    method: 'GET',
-    url: '/'
-  }, (error, res) => {
-    t.error(error)
-    t.equal(res.statusCode, 418)
-    t.same(
-      {
-        error: statusCodes['418'],
-        message: err.message,
-        statusCode: 418
-      },
-      JSON.parse(res.payload)
-    )
-  })
-})
+test('customErrorHandler support without throwing', (t) => {
+    t.plan(4);
 
-test('customErrorHandler support', t => {
-  t.plan(4)
+    const fastify = Fastify();
 
-  const fastify = Fastify()
+    fastify.get('/', async (req, reply) => {
+        const error = new Error('ouch');
+        error.statusCode = 400;
+        throw error;
+    });
 
-  fastify.get('/', async (req, reply) => {
-    const error = new Error('ouch')
-    error.statusCode = 400
-    throw error
-  })
+    fastify.setErrorHandler(async (err, req, reply) => {
+        t.equal(err.message, 'ouch');
+        await reply.code(401).send('kaboom');
+        reply.send = t.fail.bind(t, 'should not be called');
+    });
 
-  fastify.setErrorHandler(async err => {
-    t.equal(err.message, 'ouch')
-    const error = new Error('kaboom')
-    error.statusCode = 401
-    throw error
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 401)
-    t.same(
-      {
-        error: statusCodes['401'],
-        message: 'kaboom',
-        statusCode: 401
-      },
-      JSON.parse(res.payload)
-    )
-  })
-})
-
-test('customErrorHandler support without throwing', t => {
-  t.plan(4)
-
-  const fastify = Fastify()
-
-  fastify.get('/', async (req, reply) => {
-    const error = new Error('ouch')
-    error.statusCode = 400
-    throw error
-  })
-
-  fastify.setErrorHandler(async (err, req, reply) => {
-    t.equal(err.message, 'ouch')
-    await reply.code(401).send('kaboom')
-    reply.send = t.fail.bind(t, 'should not be called')
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 401)
-    t.same(
-      'kaboom',
-      res.payload
-    )
-  })
-})
+    fastify.inject(
+        {
+            method: 'GET',
+            url: '/',
+        },
+        (err, res) => {
+            t.error(err);
+            t.equal(res.statusCode, 401);
+            t.same('kaboom', res.payload);
+        },
+    );
+});
 
 // See https://github.com/fastify/fastify/issues/2653
-test('customErrorHandler only called if reply not already sent', t => {
-  t.plan(3)
+test('customErrorHandler only called if reply not already sent', (t) => {
+    t.plan(3);
 
-  const fastify = Fastify()
+    const fastify = Fastify();
 
-  fastify.get('/', async (req, reply) => {
-    await reply.send('success')
-    const error = new Error('ouch')
-    error.statusCode = 400
-    throw error
-  })
+    fastify.get('/', async (req, reply) => {
+        await reply.send('success');
+        const error = new Error('ouch');
+        error.statusCode = 400;
+        throw error;
+    });
 
-  fastify.setErrorHandler(t.fail.bind(t, 'should not be called'))
+    fastify.setErrorHandler(t.fail.bind(t, 'should not be called'));
 
-  fastify.inject({
-    method: 'GET',
-    url: '/'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(
-      'success',
-      res.payload
-    )
-  })
-})
-
-// See https://github.com/fastify/fastify/issues/3209
-test('setNotFoundHandler should accept return value', t => {
-  t.plan(3)
-
-  const fastify = Fastify()
-
-  fastify.get('/', async () => ({ hello: 'world' }))
-
-  fastify.setNotFoundHandler((req, reply) => {
-    reply.code(404)
-    return {
-      error: statusCodes['404'],
-      message: 'lost',
-      statusCode: 404
-    }
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/elsewhere'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 404)
-    t.same(
-      {
-        error: statusCodes['404'],
-        message: 'lost',
-        statusCode: 404
-      },
-      JSON.parse(res.payload)
-    )
-  })
-})
+    fastify.inject(
+        {
+            method: 'GET',
+            url: '/',
+        },
+        (err, res) => {
+            t.error(err);
+            t.equal(res.statusCode, 200);
+            t.same('success', res.payload);
+        },
+    );
+});
 
 // See https://github.com/fastify/fastify/issues/3209
-test('customErrorHandler should accept return value', t => {
-  t.plan(4)
+test('setNotFoundHandler should accept return value', (t) => {
+    t.plan(3);
 
-  const fastify = Fastify()
+    const fastify = Fastify();
 
-  fastify.get('/', async (req, reply) => {
-    const error = new Error('ouch')
-    error.statusCode = 400
-    throw error
-  })
+    fastify.get('/', async () => ({hello: 'world'}));
 
-  fastify.setErrorHandler((err, req, reply) => {
-    t.equal(err.message, 'ouch')
-    reply.code(401)
-    return {
-      error: statusCodes['401'],
-      message: 'kaboom',
-      statusCode: 401
-    }
-  })
+    fastify.setNotFoundHandler((req, reply) => {
+        reply.code(404);
+        return {
+            error: statusCodes['404'],
+            message: 'lost',
+            statusCode: 404,
+        };
+    });
 
-  fastify.inject({
-    method: 'GET',
-    url: '/'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 401)
-    t.same(
-      {
-        error: statusCodes['401'],
-        message: 'kaboom',
-        statusCode: 401
-      },
-      JSON.parse(res.payload)
-    )
-  })
-})
+    fastify.inject(
+        {
+            method: 'GET',
+            url: '/elsewhere',
+        },
+        (err, res) => {
+            t.error(err);
+            t.equal(res.statusCode, 404);
+            t.same(
+                {
+                    error: statusCodes['404'],
+                    message: 'lost',
+                    statusCode: 404,
+                },
+                JSON.parse(res.payload),
+            );
+        },
+    );
+});
 
-test('await self', async t => {
-  const app = Fastify()
-  t.equal(await app, app)
-})
+// See https://github.com/fastify/fastify/issues/3209
+test('customErrorHandler should accept return value', (t) => {
+    t.plan(4);
+
+    const fastify = Fastify();
+
+    fastify.get('/', async (req, reply) => {
+        const error = new Error('ouch');
+        error.statusCode = 400;
+        throw error;
+    });
+
+    fastify.setErrorHandler((err, req, reply) => {
+        t.equal(err.message, 'ouch');
+        reply.code(401);
+        return {
+            error: statusCodes['401'],
+            message: 'kaboom',
+            statusCode: 401,
+        };
+    });
+
+    fastify.inject(
+        {
+            method: 'GET',
+            url: '/',
+        },
+        (err, res) => {
+            t.error(err);
+            t.equal(res.statusCode, 401);
+            t.same(
+                {
+                    error: statusCodes['401'],
+                    message: 'kaboom',
+                    statusCode: 401,
+                },
+                JSON.parse(res.payload),
+            );
+        },
+    );
+});
+
+test('await self', async (t) => {
+    const app = Fastify();
+    t.equal(await app, app);
+});

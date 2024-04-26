@@ -25,13 +25,13 @@ in this document:
    and verified against alternative runtimes that are compatible with Node.js.
    The maintenance teams of these alternative runtimes are responsible for ensuring
    and guaranteeing these tests work properly.
-      1. [N|Solid](https://docs.nodesource.com/nsolid), maintained by NodeSource,
-      commits to testing and verifying each Fastify major release against the N|Solid
-      LTS versions that are current at the time of the Fastify release.
-      NodeSource guarantees that Fastify will be compatible and function correctly
-      with N|Solid, aligning with the support and compatibility scope of the N|Solid
-      LTS versions available at the time of the Fastify release.
-      This ensures users of N|Solid can confidently use Fastify.
+    1. [N|Solid](https://docs.nodesource.com/nsolid), maintained by NodeSource,
+       commits to testing and verifying each Fastify major release against the N|Solid
+       LTS versions that are current at the time of the Fastify release.
+       NodeSource guarantees that Fastify will be compatible and function correctly
+       with N|Solid, aligning with the support and compatibility scope of the N|Solid
+       LTS versions available at the time of the Fastify release.
+       This ensures users of N|Solid can confidently use Fastify.
 
 A "month" is defined as 30 consecutive days.
 
@@ -71,10 +71,10 @@ YAML workflow labels below:
 
 | OS      | YAML Workflow Label | Package Manager | Node.js     | Nsolid(Node)  |
 | ------- | ------------------- | --------------- | ----------- | ------------- |
-| Linux   | `ubuntu-latest`   | npm             | 14,16,18,20 | v5(18),v5(20) |
-| Linux   | `ubuntu-latest`   | yarn,pnpm       | 14,16,18,20 | v5(18),v5(20) |
-| Windows | `windows-latest`  | npm             | 14,16,18,20 | v5(18),v5(20) |
-| MacOS   | `macos-latest`    | npm             | 14,16,18,20 | v5(18),v5(20) |
+| Linux   | `ubuntu-latest`     | npm             | 14,16,18,20 | v5(18),v5(20) |
+| Linux   | `ubuntu-latest`     | yarn,pnpm       | 14,16,18,20 | v5(18),v5(20) |
+| Windows | `windows-latest`    | npm             | 14,16,18,20 | v5(18),v5(20) |
+| MacOS   | `macos-latest`      | npm             | 14,16,18,20 | v5(18),v5(20) |
 
 Using [yarn](https://yarnpkg.com/) might require passing the `--ignore-engines`
 flag.

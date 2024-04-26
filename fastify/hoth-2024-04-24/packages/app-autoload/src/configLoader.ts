@@ -5,8 +5,7 @@ async function loadConfigModule(appRoot: string, subPath: string) {
     try {
         const result = await loadModule(join(appRoot, `config/${subPath}`));
         return result;
-    }
-    catch (e: any) {
+    } catch (e: any) {
         if (e.code !== 'MODULE_NOT_FOUND') {
             console.error('load module error', e);
         }
@@ -15,16 +14,13 @@ async function loadConfigModule(appRoot: string, subPath: string) {
 }
 
 export async function loadConfig(appRoot: string) {
-    const [
-        pluginConfig,
-        warmupConfig
-    ] = await Promise.all([
+    const [pluginConfig, warmupConfig] = await Promise.all([
         loadConfigModule(appRoot, 'plugin'),
-        loadConfigModule(appRoot, 'warmup')
+        loadConfigModule(appRoot, 'warmup'),
     ]);
 
     return {
         pluginConfig,
-        warmupConfig
+        warmupConfig,
     };
 }

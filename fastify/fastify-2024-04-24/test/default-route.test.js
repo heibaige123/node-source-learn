@@ -1,88 +1,91 @@
-'use strict'
+'use strict';
 
-const t = require('tap')
-const test = t.test
-const Fastify = require('..')
-const { FSTDEP014 } = require('../lib/warnings')
+const t = require('tap');
+const test = t.test;
+const Fastify = require('..');
+const {FSTDEP014} = require('../lib/warnings');
 
 // Silence the standard warning logs. We will test the messages explicitly.
-process.removeAllListeners('warning')
+process.removeAllListeners('warning');
 
-test('setDefaultRoute should emit a deprecation warning', t => {
-  t.plan(2)
+test('setDefaultRoute should emit a deprecation warning', (t) => {
+    t.plan(2);
 
-  const fastify = Fastify()
-  const defaultRoute = (req, res) => {
-    res.end('hello from defaultRoute')
-  }
+    const fastify = Fastify();
+    const defaultRoute = (req, res) => {
+        res.end('hello from defaultRoute');
+    };
 
-  process.on('warning', onWarning)
-  function onWarning (warning) {
-    t.equal(warning.name, 'DeprecationWarning')
-    t.equal(warning.code, FSTDEP014.code)
-  }
+    process.on('warning', onWarning);
+    function onWarning(warning) {
+        t.equal(warning.name, 'DeprecationWarning');
+        t.equal(warning.code, FSTDEP014.code);
+    }
 
-  t.teardown(() => {
-    process.removeListener('warning', onWarning)
-    FSTDEP014.emitted = false
-  })
+    t.teardown(() => {
+        process.removeListener('warning', onWarning);
+        FSTDEP014.emitted = false;
+    });
 
-  fastify.setDefaultRoute(defaultRoute)
-})
+    fastify.setDefaultRoute(defaultRoute);
+});
 
-test('getDefaultRoute should emit a deprecation warning', t => {
-  t.plan(2)
+test('getDefaultRoute should emit a deprecation warning', (t) => {
+    t.plan(2);
 
-  const fastify = Fastify()
+    const fastify = Fastify();
 
-  process.on('warning', onWarning)
-  function onWarning (warning) {
-    t.equal(warning.name, 'DeprecationWarning')
-    t.equal(warning.code, FSTDEP014.code)
-  }
+    process.on('warning', onWarning);
+    function onWarning(warning) {
+        t.equal(warning.name, 'DeprecationWarning');
+        t.equal(warning.code, FSTDEP014.code);
+    }
 
-  t.teardown(() => {
-    process.removeListener('warning', onWarning)
-    FSTDEP014.emitted = false
-  })
+    t.teardown(() => {
+        process.removeListener('warning', onWarning);
+        FSTDEP014.emitted = false;
+    });
 
-  fastify.getDefaultRoute()
-})
+    fastify.getDefaultRoute();
+});
 
-test('should fail if defaultRoute is not a function', t => {
-  t.plan(1)
+test('should fail if defaultRoute is not a function', (t) => {
+    t.plan(1);
 
-  const fastify = Fastify()
-  const defaultRoute = {}
+    const fastify = Fastify();
+    const defaultRoute = {};
 
-  fastify.get('/', () => {})
+    fastify.get('/', () => {});
 
-  try {
-    fastify.setDefaultRoute(defaultRoute)
-  } catch (error) {
-    t.equal(error.code, 'FST_ERR_DEFAULT_ROUTE_INVALID_TYPE')
-  }
-})
+    try {
+        fastify.setDefaultRoute(defaultRoute);
+    } catch (error) {
+        t.equal(error.code, 'FST_ERR_DEFAULT_ROUTE_INVALID_TYPE');
+    }
+});
 
-test('correctly sets, returns, and calls defaultRoute', t => {
-  t.plan(3)
+test('correctly sets, returns, and calls defaultRoute', (t) => {
+    t.plan(3);
 
-  const fastify = Fastify()
-  const defaultRoute = (req, res) => {
-    res.end('hello from defaultRoute')
-  }
+    const fastify = Fastify();
+    const defaultRoute = (req, res) => {
+        res.end('hello from defaultRoute');
+    };
 
-  fastify.setDefaultRoute(defaultRoute)
-  const returnedDefaultRoute = fastify.getDefaultRoute()
-  t.equal(returnedDefaultRoute, defaultRoute)
+    fastify.setDefaultRoute(defaultRoute);
+    const returnedDefaultRoute = fastify.getDefaultRoute();
+    t.equal(returnedDefaultRoute, defaultRoute);
 
-  fastify.get('/', () => {})
+    fastify.get('/', () => {});
 
-  fastify.inject({
-    method: 'GET',
-    url: '/random'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.body, 'hello from defaultRoute')
-  })
-})
+    fastify.inject(
+        {
+            method: 'GET',
+            url: '/random',
+        },
+        (err, res) => {
+            t.error(err);
+            t.equal(res.body, 'hello from defaultRoute');
+        },
+    );
+});

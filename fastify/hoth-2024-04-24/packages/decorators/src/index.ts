@@ -40,7 +40,10 @@ export function getFastifyInstanceByAppName(name: string) {
     return appFastifyInstanceTokenMap.get(name);
 }
 
-export const bootstrap = fastifyPlugin(async function (fastify: FastifyInstance, config: BootstrapConfig) {
+export const bootstrap = fastifyPlugin(async function (
+    fastify: FastifyInstance,
+    config: BootstrapConfig,
+) {
     const appName = config.appName;
     appFastifyInstanceTokenMap.set(appName, fastify);
     return await bootstrapInner(fastify, config);
@@ -69,4 +72,3 @@ declare module 'fastify' {
         };
     }
 }
-

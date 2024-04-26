@@ -94,8 +94,10 @@ async function load(appConfig: AppConfig, childInstance: FastifyInstance) {
     childInstance.decorate('$appConfig', configProxy);
     childInstance.decorate('molecule', molecule);
 
-
-    childInstance.addHook('onRequest', onRequestFactory(configProxy, childInstance));
+    childInstance.addHook(
+        'onRequest',
+        onRequestFactory(configProxy, childInstance),
+    );
     childInstance.addHook('preParsing', preParsing);
     childInstance.addHook('preValidation', preValidation);
     childInstance.addHook('preHandler', loggerMiddleware);
@@ -120,7 +122,9 @@ async function load(appConfig: AppConfig, childInstance: FastifyInstance) {
     }
 
     // register app plugins
-    const appEntryModule: FastifyPluginAsync = await loadModule(pluginAppConfig.entryPath);
+    const appEntryModule: FastifyPluginAsync = await loadModule(
+        pluginAppConfig.entryPath,
+    );
     // @ts-ignore
     appEntryModule[Symbol.for('skip-override')] = true;
     await childInstance.register(appEntryModule, {...appConfig});
@@ -150,12 +154,7 @@ async function load(appConfig: AppConfig, childInstance: FastifyInstance) {
 }
 
 export async function getApps(opts: AppAutoload): Promise<AppConfig[]> {
-    const {
-        dir,
-        rootPath,
-        prefix,
-        name,
-    } = opts;
+    const {dir, rootPath, prefix, name} = opts;
 
     let appRoot = dir;
     if (!isAbsolute(appRoot)) {
@@ -172,19 +171,24 @@ export async function getApps(opts: AppAutoload): Promise<AppConfig[]> {
     if (existsSync(join(appRoot, 'app.js'))) {
         const configs = await loadConfig(appRoot);
         let appPrefix = prefix;
-        if (configs.pluginConfig && configs.pluginConfig['@hoth/app-autoload']) {
-            appPrefix = configs.pluginConfig['@hoth/app-autoload'].prefix || appPrefix;
+        if (
+            configs.pluginConfig &&
+            configs.pluginConfig['@hoth/app-autoload']
+        ) {
+            appPrefix =
+                configs.pluginConfig['@hoth/app-autoload'].prefix || appPrefix;
             delete configs.pluginConfig['@hoth/app-autoload'];
         }
-        apps = [{
-            dir: appRoot,
-            prefix: appPrefix,
-            name: name || (prefix === '/' ? 'root' : prefix.slice(1)),
-            rootPath,
-            ...configs,
-        }];
-    }
-    else {
+        apps = [
+            {
+                dir: appRoot,
+                prefix: appPrefix,
+                name: name || (prefix === '/' ? 'root' : prefix.slice(1)),
+                rootPath,
+                ...configs,
+            },
+        ];
+    } else {
         const dirs = readdirSync(appRoot, {withFileTypes: true});
         for (const dir of dirs) {
             const dirPath = resolve(appRoot, dir.name);
@@ -192,8 +196,13 @@ export async function getApps(opts: AppAutoload): Promise<AppConfig[]> {
                 const configs = await loadConfig(dirPath);
 
                 let appPrefix = prefix;
-                if (configs.pluginConfig && configs.pluginConfig['@hoth/app-autoload']) {
-                    appPrefix = configs.pluginConfig['@hoth/app-autoload'].prefix || appPrefix;
+                if (
+                    configs.pluginConfig &&
+                    configs.pluginConfig['@hoth/app-autoload']
+                ) {
+                    appPrefix =
+                        configs.pluginConfig['@hoth/app-autoload'].prefix ||
+                        appPrefix;
                     delete configs.pluginConfig['@hoth/app-autoload'];
                 }
                 apps.push({
@@ -214,34 +223,33 @@ export async function getApps(opts: AppAutoload): Promise<AppConfig[]> {
     return apps;
 }
 
-export default fp(async function (instance: FastifyInstance, opts: AppAutoload | AppsLoaded) {
-
-    // eslint-disable-next-line @typescript-eslint/init-declarations
-    let apps: AppConfig[];
-    if ((opts as AppsLoaded).apps) {
-        apps = (opts as AppsLoaded).apps;
-    }
-    else {
-        apps = (await getApps(opts as AppAutoload))!;
-    }
-
-    for await (const appConfig of apps) {
-        try {
-            await instance.register(load.bind(null, appConfig), {
-                prefix: appConfig.prefix,
-            });
+export default fp(
+    async function (instance: FastifyInstance, opts: AppAutoload | AppsLoaded) {
+        // eslint-disable-next-line @typescript-eslint/init-declarations
+        let apps: AppConfig[];
+        if ((opts as AppsLoaded).apps) {
+            apps = (opts as AppsLoaded).apps;
+        } else {
+            apps = (await getApps(opts as AppAutoload))!;
         }
-        catch (e) {
-            instance.log.fatal({
-                app: appConfig.name,
-                err: e
-            });
+
+        for await (const appConfig of apps) {
+            try {
+                await instance.register(load.bind(null, appConfig), {
+                    prefix: appConfig.prefix,
+                });
+            } catch (e) {
+                instance.log.fatal({
+                    app: appConfig.name,
+                    err: e,
+                });
+            }
         }
-    }
 
-    return;
-
-}, {
-    fastify: '>= 3.0.0 < 5.0.0',
-    name: '@hoth/app-autoload',
-});
+        return;
+    },
+    {
+        fastify: '>= 3.0.0 < 5.0.0',
+        name: '@hoth/app-autoload',
+    },
+);

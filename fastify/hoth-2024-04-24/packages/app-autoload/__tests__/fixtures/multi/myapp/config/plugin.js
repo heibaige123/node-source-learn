@@ -3,4 +3,4 @@ exports.default = {
         prefix: '/another',
     },
 };
-Object.defineProperty(exports, '__esModule', {value: true})
+Object.defineProperty(exports, '__esModule', {value: true});

@@ -1,6 +1,7 @@
 <h1 align="center">Fastify</h1>
 
 ## Encapsulation
+
 <a id="encapsulation"></a>
 
 A fundamental feature of Fastify is the "encapsulation context." The
@@ -16,8 +17,8 @@ In the above figure, there are several entities:
 1. The _root context_
 2. Three _root plugins_
 3. Two _child contexts_ where each _child context_ has
-    * Two _child plugins_
-    * One _grandchild context_ where each _grandchild context_ has
+    - Two _child plugins_
+    - One _grandchild context_ where each _grandchild context_ has
         - Three _child plugins_
 
 Every _child context_ and _grandchild context_ has access to the _root plugins_.
@@ -37,76 +38,76 @@ access to the same context as the second route. Using
 example is as follows:
 
 ```js
-'use strict'
+'use strict';
 
-const fastify = require('fastify')()
+const fastify = require('fastify')();
 
-fastify.decorateRequest('answer', 42)
+fastify.decorateRequest('answer', 42);
 
-fastify.register(async function authenticatedContext (childServer) {
-  childServer.register(require('@fastify/bearer-auth'), { keys: ['abc123'] })
+fastify.register(async function authenticatedContext(childServer) {
+    childServer.register(require('@fastify/bearer-auth'), {keys: ['abc123']});
 
-  childServer.route({
-    path: '/one',
-    method: 'GET',
-    handler (request, response) {
-      response.send({
-        answer: request.answer,
-        // request.foo will be undefined as it's only defined in publicContext
-        foo: request.foo,
-        // request.bar will be undefined as it's only defined in grandchildContext
-        bar: request.bar
-      })
-    }
-  })
-})
+    childServer.route({
+        path: '/one',
+        method: 'GET',
+        handler(request, response) {
+            response.send({
+                answer: request.answer,
+                // request.foo will be undefined as it's only defined in publicContext
+                foo: request.foo,
+                // request.bar will be undefined as it's only defined in grandchildContext
+                bar: request.bar,
+            });
+        },
+    });
+});
 
-fastify.register(async function publicContext (childServer) {
-  childServer.decorateRequest('foo', 'foo')
+fastify.register(async function publicContext(childServer) {
+    childServer.decorateRequest('foo', 'foo');
 
-  childServer.route({
-    path: '/two',
-    method: 'GET',
-    handler (request, response) {
-      response.send({
-        answer: request.answer,
-        foo: request.foo,
-        // request.bar will be undefined as it's only defined in grandchildContext
-        bar: request.bar
-      })
-    }
-  })
+    childServer.route({
+        path: '/two',
+        method: 'GET',
+        handler(request, response) {
+            response.send({
+                answer: request.answer,
+                foo: request.foo,
+                // request.bar will be undefined as it's only defined in grandchildContext
+                bar: request.bar,
+            });
+        },
+    });
 
-  childServer.register(async function grandchildContext (grandchildServer) {
-    grandchildServer.decorateRequest('bar', 'bar')
+    childServer.register(async function grandchildContext(grandchildServer) {
+        grandchildServer.decorateRequest('bar', 'bar');
 
-    grandchildServer.route({
-      path: '/three',
-      method: 'GET',
-      handler (request, response) {
-        response.send({
-          answer: request.answer,
-          foo: request.foo,
-          bar: request.bar
-        })
-      }
-    })
-  })
-})
+        grandchildServer.route({
+            path: '/three',
+            method: 'GET',
+            handler(request, response) {
+                response.send({
+                    answer: request.answer,
+                    foo: request.foo,
+                    bar: request.bar,
+                });
+            },
+        });
+    });
+});
 
-fastify.listen({ port: 8000 })
+fastify.listen({port: 8000});
 ```
 
 The above server example shows all of the encapsulation concepts outlined in the
 original diagram:
 
 1. Each _child context_ (`authenticatedContext`, `publicContext`, and
-`grandchildContext`) has access to the `answer` request decorator defined in
-the _root context_.
+   `grandchildContext`) has access to the `answer` request decorator defined in
+   the _root context_.
 2. Only the `authenticatedContext` has access to the `@fastify/bearer-auth`
-plugin.
+   plugin.
 3. Both the `publicContext` and `grandchildContext` have access to the `foo`
-request decorator.
+   request decorator.
 4. Only the `grandchildContext` has access to the `bar` request decorator.
 
 To see this, start the server and issue requests:
@@ -123,6 +124,7 @@ To see this, start the server and issue requests:
 [bearer]: https://github.com/fastify/fastify-bearer-auth
 
 ## Sharing Between Contexts
+
 <a id="shared-context"></a>
 
 Notice that each context in the prior example inherits _only_ from the parent
@@ -137,50 +139,50 @@ within the `grandchildContext` in the previous example, the code can be
 rewritten as:
 
 ```js
-'use strict'
+'use strict';
 
-const fastify = require('fastify')()
-const fastifyPlugin = require('fastify-plugin')
+const fastify = require('fastify')();
+const fastifyPlugin = require('fastify-plugin');
 
-fastify.decorateRequest('answer', 42)
+fastify.decorateRequest('answer', 42);
 
 // `authenticatedContext` omitted for clarity
 
-fastify.register(async function publicContext (childServer) {
-  childServer.decorateRequest('foo', 'foo')
+fastify.register(async function publicContext(childServer) {
+    childServer.decorateRequest('foo', 'foo');
 
-  childServer.route({
-    path: '/two',
-    method: 'GET',
-    handler (request, response) {
-      response.send({
-        answer: request.answer,
-        foo: request.foo,
-        bar: request.bar
-      })
+    childServer.route({
+        path: '/two',
+        method: 'GET',
+        handler(request, response) {
+            response.send({
+                answer: request.answer,
+                foo: request.foo,
+                bar: request.bar,
+            });
+        },
+    });
+
+    childServer.register(fastifyPlugin(grandchildContext));
+
+    async function grandchildContext(grandchildServer) {
+        grandchildServer.decorateRequest('bar', 'bar');
+
+        grandchildServer.route({
+            path: '/three',
+            method: 'GET',
+            handler(request, response) {
+                response.send({
+                    answer: request.answer,
+                    foo: request.foo,
+                    bar: request.bar,
+                });
+            },
+        });
     }
-  })
+});
 
-  childServer.register(fastifyPlugin(grandchildContext))
-
-  async function grandchildContext (grandchildServer) {
-    grandchildServer.decorateRequest('bar', 'bar')
-
-    grandchildServer.route({
-      path: '/three',
-      method: 'GET',
-      handler (request, response) {
-        response.send({
-          answer: request.answer,
-          foo: request.foo,
-          bar: request.bar
-        })
-      }
-    })
-  }
-})
-
-fastify.listen({ port: 8000 })
+fastify.listen({port: 8000});
 ```
 
 Restarting the server and re-issuing the requests for `/two` and `/three`:
